@@ -12,7 +12,8 @@ import type { BaseChatModel } from '@langchain/core/language_models/chat_models'
 
 const VideoSearchChainPrompt = `
   You will be given a conversation below and a follow up question. You need to rephrase the follow-up question so it is a standalone question that can be used by the LLM to search Youtube for videos.
-  You need to make sure the rephrased question agrees with the conversation and is relevant to the conversation.
+  You need to make sure the rephrased question agrees with the conversation and is relevant to the conversation. Important: Please strictly follow the instructions below.
+  Only return the rephrased question, no other text.
   
   Example:
   1. Follow up question: How does a car work?
@@ -27,6 +28,9 @@ const VideoSearchChainPrompt = `
   Conversation:
   {chat_history}
   
+  Instructions to strictly follow:
+  {memories}
+
   Follow up question: {query}
   Rephrased question:
   `;
@@ -34,6 +38,7 @@ const VideoSearchChainPrompt = `
 type VideoSearchChainInput = {
   chat_history: BaseMessage[];
   query: string;
+  memories: string;
 };
 
 const strParser = new StringOutputParser();
@@ -46,6 +51,9 @@ const createVideoSearchChain = (llm: BaseChatModel) => {
       },
       query: (input: VideoSearchChainInput) => {
         return input.query;
+      },
+      memories: (input: VideoSearchChainInput) => {
+        return input.memories;
       },
     }),
     PromptTemplate.fromTemplate(VideoSearchChainPrompt),
@@ -88,4 +96,3 @@ const handleVideoSearch = (
 };
 
 export default handleVideoSearch;
- 

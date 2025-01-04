@@ -5,6 +5,9 @@ import { getAvailableChatModelProviders } from '../lib/providers';
 import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import logger from '../utils/logger';
 import { ChatOpenAI } from '@langchain/openai';
+import db from '../db/index';
+import { memories } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -25,7 +28,7 @@ interface ImageSearchBody {
 router.post('/', async (req, res) => {
   try {
     let body: ImageSearchBody = req.body;
-    
+
     // Convert chat history array to LangChain message format
     const chatHistory = body.chatHistory.map((msg: any) => {
       if (msg.role === 'user') {
@@ -67,8 +70,8 @@ router.post('/', async (req, res) => {
           baseURL: body.chatModel.customOpenAIBaseURL,
         },
       }) as unknown as BaseChatModel;
-    } 
-    
+    }
+
     // If the chat model is not custom OpenAI, use the default provider
     else if (
       chatModelProviders[chatModelProvider] &&
@@ -82,9 +85,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Invalid model selected' });
     }
 
+    const memoryRecords = await db.query.memories.findMany({
+      where: eq(memories.type, 'image'),
+    });
+
+    const memoryContents = memoryRecords
+      .map((record, index) => `${index + 1}. ${record.content}`)
+      .join('\n');
+
     // Perform image search using the selected chat model
     const images = await handleImageSearch(
-      { query: body.query, chat_history: chatHistory },
+      {
+        query: body.query,
+        chat_history: chatHistory,
+        memories: memoryContents,
+      },
       llm,
     );
 

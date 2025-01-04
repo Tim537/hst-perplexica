@@ -5,6 +5,9 @@ import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import logger from '../utils/logger';
 import handleVideoSearch from '../chains/videoSearchAgent';
 import { ChatOpenAI } from '@langchain/openai';
+import db from '../db/index';
+import { memories } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -81,9 +84,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Invalid model selected' });
     }
 
+    const memoryRecords = await db.query.memories.findMany({
+      where: eq(memories.type, 'video'),
+    });
+
+    const memoryContents = memoryRecords
+      .map((record, index) => `${index + 1}. ${record.content}`)
+      .join('\n');
+
     // Perform video search using the selected chat model
     const videos = await handleVideoSearch(
-      { chat_history: chatHistory, query: body.query },
+      {
+        chat_history: chatHistory,
+        query: body.query,
+        memories: memoryContents,
+      },
       llm,
     );
 
