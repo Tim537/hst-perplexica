@@ -25,6 +25,9 @@ import formatChatHistoryAsString from '../utils/formatHistory';
 import eventEmitter from 'events';
 import { StreamEvent } from '@langchain/core/tracers/log_stream';
 import { IterableReadableStream } from '@langchain/core/utils/stream';
+import db from '../db/index';
+import { memories } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 export interface MetaSearchAgentType {
   searchAndAnswer: (
@@ -50,6 +53,7 @@ interface Config {
 type BasicChainInput = {
   chat_history: BaseMessage[];
   query: string;
+  memories: string;
 };
 
 class MetaSearchAgent implements MetaSearchAgentType {
@@ -240,6 +244,7 @@ class MetaSearchAgent implements MetaSearchAgentType {
       RunnableMap.from({
         query: (input: BasicChainInput) => input.query,
         chat_history: (input: BasicChainInput) => input.chat_history,
+        memories: (input: BasicChainInput) => input.memories,
         date: () => new Date().toISOString(),
         context: RunnableLambda.from(async (input: BasicChainInput) => {
           const processedHistory = formatChatHistoryAsString(
@@ -248,7 +253,6 @@ class MetaSearchAgent implements MetaSearchAgentType {
 
           let docs: Document[] | null = null;
           let query = input.query;
-
           if (this.config.searchWeb) {
             const searchRetrieverChain =
               await this.createSearchRetrieverChain(llm);
@@ -281,6 +285,7 @@ class MetaSearchAgent implements MetaSearchAgentType {
         ['system', this.config.responsePrompt],
         new MessagesPlaceholder('chat_history'),
         ['user', '{query}'],
+        ['user', '{memories}'],
       ]),
       llm,
       this.strParser,
@@ -475,10 +480,19 @@ class MetaSearchAgent implements MetaSearchAgentType {
       optimizationMode,
     );
 
+    const memoryRecords = await db.query.memories.findMany({
+      where: eq(memories.type, 'text'),
+    });
+
+    const memoryContents = memoryRecords
+      .map((record, index) => `${index + 1}. ${record.content}`)
+      .join('\n');
+
     const stream = answeringChain.streamEvents(
       {
         chat_history: history,
         query: message,
+        memories: memoryContents,
       },
       {
         version: 'v1',

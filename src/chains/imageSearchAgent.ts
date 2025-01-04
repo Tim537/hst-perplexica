@@ -1,6 +1,6 @@
 /**
  * Image Search Agent Module
- * 
+ *
  * This module provides functionality to search for images using multiple search engines
  * through the SearxNG metasearch engine API. It processes user queries in the context
  * of a conversation and returns relevant image results.
@@ -24,7 +24,8 @@ import type { BaseChatModel } from '@langchain/core/language_models/chat_models'
  */
 const imageSearchChainPrompt = `
 You will be given a conversation below and a follow up question. You need to rephrase the follow-up question so it is a standalone question that can be used by the LLM to search the web for images.
-You need to make sure the rephrased question agrees with the conversation and is relevant to the conversation.
+You need to make sure the rephrased question agrees with the conversation and is relevant to the conversation. Important: Please strictly follow the instructions below.
+Only return the rephrased question, no other text.
 
 Example:
 1. Follow up question: What is a cat?
@@ -39,6 +40,9 @@ Rephrased: AC working
 Conversation:
 {chat_history}
 
+Instructions to strictly follow:
+{memories}
+
 Follow up question: {query}
 Rephrased question:
 `;
@@ -47,8 +51,9 @@ Rephrased question:
  * Type definition for the input required by the image search chain
  */
 type ImageSearchChainInput = {
-  chat_history: BaseMessage[];  // Array of previous chat messages
-  query: string;               // Current user query
+  chat_history: BaseMessage[]; // Array of previous chat messages
+  query: string; // Current user query
+  memories: string; // Memories
 };
 
 // Parser to convert LLM output to string
@@ -68,6 +73,9 @@ const createImageSearchChain = (llm: BaseChatModel) => {
       },
       query: (input: ImageSearchChainInput) => {
         return input.query;
+      },
+      memories: (input: ImageSearchChainInput) => {
+        return input.memories;
       },
     }),
     PromptTemplate.fromTemplate(imageSearchChainPrompt),
