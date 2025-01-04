@@ -14,6 +14,7 @@ import { useSelectedLayoutSegments } from 'next/navigation';
 import React, { useState, type ReactNode } from 'react';
 import Layout from './Layout';
 import SettingsDialog from './SettingsDialog';
+import Memories from './Memories';
 
 const VerticalIconContainer = ({ children }: { children: ReactNode }) => {
   return (
@@ -25,6 +26,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   const segments = useSelectedLayoutSegments();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isMemoriesOpen, setIsMemoriesOpen] = useState(false);
 
   const navLinks = [
     {
@@ -92,7 +94,11 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
             ))}
           </VerticalIconContainer>
           <div className="flex flex-col gap-y-8">
-            <BrainCircuit className="cursor-pointer hover:scale-110 transition duration-150" />
+            <BrainCircuit
+              onClick={() => setIsMemoriesOpen(!isMemoriesOpen)}
+              className="cursor-pointer hover:scale-110 transition duration-150"
+            />
+            <Memories isOpen={isMemoriesOpen} setIsOpen={setIsMemoriesOpen} />
             <Settings
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               className="cursor-pointer hover:scale-110 hover:rotate-90 transition duration-150"
