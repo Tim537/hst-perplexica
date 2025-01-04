@@ -7,6 +7,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const data = (
+      // search for AI and tech news
       await Promise.all([
         searchSearxng('site:businessinsider.com AI', {
           engines: ['bing news'],
@@ -34,9 +35,9 @@ router.get('/', async (req, res) => {
         }),
       ])
     )
-      .map((result) => result.results)
-      .flat()
-      .sort(() => Math.random() - 0.5);
+      .map((result) => result.results) // Extract the results from each search
+      .flat() // Flatten the array of results
+      .sort(() => Math.random() - 0.5); // Randomize the order of the results
 
     return res.json({ blogs: data });
   } catch (err: any) {

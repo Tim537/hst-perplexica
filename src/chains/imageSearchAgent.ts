@@ -1,3 +1,11 @@
+/**
+ * Image Search Agent Module
+ * 
+ * This module provides functionality to search for images using multiple search engines
+ * through the SearxNG metasearch engine API. It processes user queries in the context
+ * of a conversation and returns relevant image results.
+ */
+
 import {
   RunnableSequence,
   RunnableMap,
@@ -10,6 +18,10 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { searchSearxng } from '../lib/searxng';
 import type { BaseChatModel } from '@langchain/core/language_models/chat_models';
 
+/**
+ * Prompt template for rephrasing user queries into standalone image search queries.
+ * Includes examples to demonstrate the expected transformation of queries.
+ */
 const imageSearchChainPrompt = `
 You will be given a conversation below and a follow up question. You need to rephrase the follow-up question so it is a standalone question that can be used by the LLM to search the web for images.
 You need to make sure the rephrased question agrees with the conversation and is relevant to the conversation.
@@ -31,15 +43,25 @@ Follow up question: {query}
 Rephrased question:
 `;
 
+/**
+ * Type definition for the input required by the image search chain
+ */
 type ImageSearchChainInput = {
-  chat_history: BaseMessage[];
-  query: string;
+  chat_history: BaseMessage[];  // Array of previous chat messages
+  query: string;               // Current user query
 };
 
+// Parser to convert LLM output to string
 const strParser = new StringOutputParser();
 
+/**
+ * Creates a chain for processing image search requests
+ * @param llm - The language model to use for query processing
+ * @returns A runnable sequence that processes and executes image searches
+ */
 const createImageSearchChain = (llm: BaseChatModel) => {
   return RunnableSequence.from([
+    // Map input data to required format
     RunnableMap.from({
       chat_history: (input: ImageSearchChainInput) => {
         return formatChatHistoryAsString(input.chat_history);
@@ -51,6 +73,7 @@ const createImageSearchChain = (llm: BaseChatModel) => {
     PromptTemplate.fromTemplate(imageSearchChainPrompt),
     llm,
     strParser,
+    // Transform search results into structured image data
     RunnableLambda.from(async (input: string) => {
       const res = await searchSearxng(input, {
         engines: ['bing images', 'google images'],
@@ -58,6 +81,7 @@ const createImageSearchChain = (llm: BaseChatModel) => {
 
       const images = [];
 
+      // Filter and format valid image results
       res.results.forEach((result) => {
         if (result.img_src && result.url && result.title) {
           images.push({
@@ -68,11 +92,18 @@ const createImageSearchChain = (llm: BaseChatModel) => {
         }
       });
 
+      // Return top 10 image results
       return images.slice(0, 10);
     }),
   ]);
 };
 
+/**
+ * Main handler function for processing image search requests
+ * @param input - Object containing chat history and user query
+ * @param llm - Language model instance for processing
+ * @returns Promise resolving to array of image results
+ */
 const handleImageSearch = (
   input: ImageSearchChainInput,
   llm: BaseChatModel,

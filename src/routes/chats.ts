@@ -5,9 +5,10 @@ import { eq } from 'drizzle-orm';
 import { chats, messages } from '../db/schema';
 
 const router = express.Router();
-
+// get all chats
 router.get('/', async (_, res) => {
   try {
+    // using the chats schema to get all chats
     let chats = await db.query.chats.findMany();
 
     chats = chats.reverse();
@@ -19,8 +20,10 @@ router.get('/', async (_, res) => {
   }
 });
 
+// get a chat by id and its messages
 router.get('/:id', async (req, res) => {
   try {
+    // using the chats schema to get a chat by id
     const chatExists = await db.query.chats.findFirst({
       where: eq(chats.id, req.params.id),
     });
@@ -29,6 +32,7 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'Chat not found' });
     }
 
+    // using the messages schema to get all messages by chatId
     const chatMessages = await db.query.messages.findMany({
       where: eq(messages.chatId, req.params.id),
     });
@@ -40,8 +44,10 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// delete a chat by id and its messages
 router.delete(`/:id`, async (req, res) => {
   try {
+    // using the chats schema to get a chat by id
     const chatExists = await db.query.chats.findFirst({
       where: eq(chats.id, req.params.id),
     });
@@ -50,7 +56,9 @@ router.delete(`/:id`, async (req, res) => {
       return res.status(404).json({ message: 'Chat not found' });
     }
 
+    // using the chats schema to delete a chat by id
     await db.delete(chats).where(eq(chats.id, req.params.id)).execute();
+    // using the messages schema to delete all messages by chatId
     await db
       .delete(messages)
       .where(eq(messages.chatId, req.params.id))

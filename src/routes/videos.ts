@@ -21,10 +21,11 @@ interface VideoSearchBody {
   chatModel?: ChatModel;
 }
 
+// POST endpoint for video search
 router.post('/', async (req, res) => {
   try {
     let body: VideoSearchBody = req.body;
-
+    // Convert chat history array to LangChain message format
     const chatHistory = body.chatHistory.map((msg: any) => {
       if (msg.role === 'user') {
         return new HumanMessage(msg.content);
@@ -33,6 +34,7 @@ router.post('/', async (req, res) => {
       }
     });
 
+    // Get available chat model providers and select default if not specified
     const chatModelProviders = await getAvailableChatModelProviders();
 
     const chatModelProvider =
@@ -41,9 +43,12 @@ router.post('/', async (req, res) => {
       body.chatModel?.model ||
       Object.keys(chatModelProviders[chatModelProvider])[0];
 
+    // Initialize the chat model
     let llm: BaseChatModel | undefined;
 
+    // Check if the chat model is custom OpenAI
     if (body.chatModel?.provider === 'custom_openai') {
+      // Check if custom OpenAI base URL and key are provided
       if (
         !body.chatModel?.customOpenAIBaseURL ||
         !body.chatModel?.customOpenAIKey
@@ -53,6 +58,7 @@ router.post('/', async (req, res) => {
           .json({ message: 'Missing custom OpenAI base URL or key' });
       }
 
+      // Initialize a custom OpenAI chat model
       llm = new ChatOpenAI({
         modelName: body.chatModel.model,
         openAIApiKey: body.chatModel.customOpenAIKey,
@@ -65,14 +71,17 @@ router.post('/', async (req, res) => {
       chatModelProviders[chatModelProvider] &&
       chatModelProviders[chatModelProvider][chatModel]
     ) {
+      // Initialize the chat model from the selected provider
       llm = chatModelProviders[chatModelProvider][chatModel]
         .model as unknown as BaseChatModel | undefined;
     }
 
+    // Check if the selected model is valid
     if (!llm) {
       return res.status(400).json({ message: 'Invalid model selected' });
     }
 
+    // Perform video search using the selected chat model
     const videos = await handleVideoSearch(
       { chat_history: chatHistory, query: body.query },
       llm,
