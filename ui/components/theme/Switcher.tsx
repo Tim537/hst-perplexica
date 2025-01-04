@@ -4,7 +4,7 @@ import { SunIcon, MoonIcon, MonitorIcon } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Select } from '../SettingsDialog';
 
-type Theme = 'dark' | 'light' | 'system';
+type Theme = 'dark' | 'light' | 'hst';
 
 const ThemeSwitcher = ({ className }: { className?: string }) => {
   const [mounted, setMounted] = useState(false);
@@ -19,26 +19,10 @@ const ThemeSwitcher = ({ className }: { className?: string }) => {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (isTheme('system')) {
-      const preferDarkScheme = window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      );
-
-      const detectThemeChange = (event: MediaQueryListEvent) => {
-        const theme: Theme = event.matches ? 'dark' : 'light';
-        setTheme(theme);
-      };
-
-      preferDarkScheme.addEventListener('change', detectThemeChange);
-
-      return () => {
-        preferDarkScheme.removeEventListener('change', detectThemeChange);
-      };
+    if (!theme) {
+      setTheme('dark');
     }
-  }, [isTheme, setTheme, theme]);
+  }, []);
 
   // Avoid Hydration Mismatch
   if (!mounted) {
@@ -53,6 +37,7 @@ const ThemeSwitcher = ({ className }: { className?: string }) => {
       options={[
         { value: 'light', label: 'Light' },
         { value: 'dark', label: 'Dark' },
+        { value: 'hst', label: 'HST' },
       ]}
     />
   );

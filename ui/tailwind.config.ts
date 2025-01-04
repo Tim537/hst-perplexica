@@ -13,6 +13,13 @@ const themeLight = (colors: DefaultColors) => ({
   200: '#e8e8e3',
 });
 
+const themeHst = (colors: DefaultColors) => ({
+  50: '#fcfcf9',
+  100: '#f3f3ee',
+  200: '#e8e8e3',
+  accent: '#CA5116',
+});
+
 const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -22,15 +29,14 @@ const config: Config = {
   darkMode: 'class',
   theme: {
     extend: {
-      borderColor: ({ colors }) => {
-        return {
-          light: themeLight(colors),
-          dark: themeDark(colors),
-        };
-      },
+      backgroundColor: ({ theme }) => ({
+        ...theme('colors'),
+        'hst-accent': '#CA5116'
+      }),
       colors: ({ colors }) => {
         const colorsDark = themeDark(colors);
         const colorsLight = themeLight(colors);
+        const colorsHst = themeHst(colors);
 
         return {
           dark: {
@@ -43,10 +49,20 @@ const config: Config = {
             secondary: colorsLight[100],
             ...colorsLight,
           },
+          hst: {
+            primary: colorsHst[50],
+            secondary: colorsHst[100],
+            ...colorsHst,
+          },
         };
       },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+    function({ addVariant }: { addVariant: (name: string, definition: string) => void }) {
+      addVariant('hst', '.hst &');
+    },
+  ],
 };
 export default config;

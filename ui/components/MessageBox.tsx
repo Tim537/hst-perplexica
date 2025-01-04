@@ -131,7 +131,7 @@ const MessageBox = ({
                           start();
                         }
                       }}
-                      className="p-2 text-black/70 dark:text-white/70 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
+                      className="p-2 hst:hover:bg-[#fcfcf9] hst:hover:text-hst-accent text-black/70 dark:text-white/70 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white"
                     >
                       {speechStatus === 'started' ? (
                         <StopCircle size={18} />

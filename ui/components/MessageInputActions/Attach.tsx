@@ -164,7 +164,7 @@ const Attach = ({
       type="button"
       onClick={() => fileInputRef.current.click()}
       className={cn(
-        'flex flex-row items-center space-x-1 text-black/50 dark:text-white/50 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary transition duration-200 hover:text-black dark:hover:text-white',
+        'flex flex-row items-center space-x-1 text-black/50 dark:text-white/50 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary hst:hover:text-hst-accent transition duration-200 hover:text-black dark:hover:text-white',
         showText ? '' : 'p-2',
       )}
     >

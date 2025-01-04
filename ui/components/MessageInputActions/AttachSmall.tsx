@@ -53,15 +53,18 @@ const AttachSmall = ({
 
   return loading ? (
     <div className="flex flex-row items-center justify-between space-x-1 p-1">
-      <LoaderCircle size={20} className="text-sky-400 animate-spin" />
+      <LoaderCircle
+        size={20}
+        className="text-sky-400 hst:text-hst-accent animate-spin"
+      />
     </div>
   ) : files.length > 0 ? (
     <Popover className="max-w-[15rem] md:max-w-md lg:max-w-lg">
       <PopoverButton
         type="button"
-        className="flex flex-row items-center justify-between space-x-1 p-1 text-black/50 dark:text-white/50 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary active:scale-95 transition duration-200 hover:text-black dark:hover:text-white"
+        className="flex flex-row items-center justify-between space-x-1 p-1  text-black/50 dark:text-white/50 rounded-xl hover:bg-light-secondary dark:hover:bg-dark-secondary active:scale-95 transition duration-200 hover:text-black dark:hover:text-white"
       >
-        <File size={20} className="text-sky-400" />
+        <File size={20} className="text-sky-400 hst:text-hst-accent" />
       </PopoverButton>
       <Transition
         as={Fragment}
@@ -93,7 +96,7 @@ const AttachSmall = ({
                     hidden
                   />
                   <Plus size={18} />
-                  <p className="text-xs">Add</p>
+                  <p className="text-xs ">Add</p>
                 </button>
                 <button
                   onClick={() => {
@@ -145,7 +148,7 @@ const AttachSmall = ({
         multiple
         hidden
       />
-      <CopyPlus size={20} />
+      <CopyPlus size={20} className="hst:hover:text-hst-accent" />
     </button>
   );
 };
