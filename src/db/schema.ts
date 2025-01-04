@@ -26,3 +26,9 @@ export const chats = sqliteTable('chats', {
     .$type<File[]>()
     .default(sql`'[]'`),
 });
+
+export const memories = sqliteTable('memories', {
+  id: text('id').primaryKey(),
+  content: text('content').notNull(),
+  type: text('type', { enum: ['text', 'image', 'video'] }).notNull(),
+});
