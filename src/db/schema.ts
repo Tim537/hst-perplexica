@@ -28,7 +28,7 @@ export const chats = sqliteTable('chats', {
 });
 
 export const memories = sqliteTable('memories', {
-  id: text('id').primaryKey(),
+  id: integer('id').primaryKey(),
   content: text('content').notNull(),
-  type: text('type', { enum: ['text', 'image', 'video'] }).notNull(),
+  type: text('type').notNull(),
 });
