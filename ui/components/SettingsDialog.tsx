@@ -13,6 +13,7 @@ import {
   Palette,
   Key,
   Box,
+  X,
 } from 'lucide-react';
 import React, {
   Fragment,
@@ -225,9 +226,6 @@ const SettingsDialog = ({
       case 'theme':
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-black/90 dark:text-white/90">
-              Theme Settings
-            </h2>
             <div className="flex flex-col space-y-4">
               <p className="text-black/70 dark:text-white/70 text-sm">
                 Choose your preferred appearance
@@ -241,11 +239,6 @@ const SettingsDialog = ({
       case 'providers':
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-black/90 dark:text-white/90">
-              Providers & Models
-            </h2>
-
-            {/* Chat Model Provider */}
             <div className="flex flex-col space-y-4">
               {config.chatModelProviders && (
                 <div className="flex flex-col space-y-1">
@@ -425,10 +418,6 @@ const SettingsDialog = ({
       case 'keys':
         return (
           <div className="space-y-6">
-            <h2 className="text-lg font-medium text-black/90 dark:text-white/90">
-              API Keys
-            </h2>
-
             <div className="flex flex-col space-y-4">
               <div className="flex flex-col space-y-1">
                 <p className="text-black/70 dark:text-white/70 text-sm">
@@ -547,9 +536,19 @@ const SettingsDialog = ({
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel className="w-full max-w-4xl transform rounded-2xl hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 p-6 text-left align-middle shadow-xl transition-all">
-                <DialogTitle className="text-xl font-medium leading-6 text-black dark:text-white mb-6">
-                  Settings
-                </DialogTitle>
+                <div className="flex justify-between items-center mb-6">
+                  <DialogTitle className="text-xl font-medium text-black dark:text-white">
+                    Settings
+                  </DialogTitle>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white"
+                    title="Close dialog"
+                    aria-label="Close dialog"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
 
                 <div className="flex gap-8">
                   {/* Navigation */}

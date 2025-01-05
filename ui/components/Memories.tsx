@@ -1,4 +1,4 @@
-import { Trash, Pencil, X } from 'lucide-react';
+import { Trash, Pencil, X, FileText, Image, Video } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import {
   Dialog,
@@ -8,6 +8,7 @@ import {
   TransitionChild,
 } from '@headlessui/react';
 import { Fragment } from 'react';
+import { cn } from '@/lib/utils';
 
 interface MemoriesType {
   id: number;
@@ -20,15 +21,40 @@ interface MemoriesProps {
   setIsOpen?: (isOpen: boolean) => void;
 }
 
+type MemorySection = 'meta' | 'image' | 'video';
+
 const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
   const [memories, setMemories] = useState<MemoriesType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newContent, setNewContent] = useState('');
-  const [newType, setNewType] = useState('text');
   const [editMemoryId, setEditMemoryId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
-  const [editType, setEditType] = useState('text');
+  const [activeSection, setActiveSection] = useState<MemorySection>('meta');
+
+  const navigationItems = [
+    {
+      id: 'meta' as MemorySection,
+      label: 'Meta Memories',
+      icon: <FileText className="w-5 h-5" />,
+      description:
+        'Memories which affects the Meta Search, e.g. Answer always in simple english',
+    },
+    {
+      id: 'image' as MemorySection,
+      label: 'Image Memories',
+      icon: <Image className="w-5 h-5" />,
+      description:
+        'Memories which affects the Image Search, e.g. search just black white Images',
+    },
+    {
+      id: 'video' as MemorySection,
+      label: 'Video Memories',
+      icon: <Video className="w-5 h-5" />,
+      description:
+        'Memories which affects the Video Search, e.g. search just english-speaking videos',
+    },
+  ];
 
   const fetchMemories = async () => {
     try {
@@ -85,12 +111,14 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newContent, type: newType }),
+        body: JSON.stringify({
+          content: newContent,
+          type: activeSection === 'meta' ? 'text' : activeSection,
+        }),
       });
 
       fetchMemories();
       setNewContent('');
-      setNewType('text');
     } catch (err) {
       console.error('Failed to create memory:', err);
     }
@@ -99,7 +127,6 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
   const startEditMemory = (memory: MemoriesType) => {
     setEditMemoryId(memory.id);
     setEditContent(memory.content);
-    setEditType(memory.type);
   };
 
   const updateMemory = async () => {
@@ -113,7 +140,7 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
         },
         body: JSON.stringify({
           content: editContent,
-          type: editType,
+          type: activeSection === 'meta' ? 'text' : activeSection,
           id: editMemoryId,
         }),
       });
@@ -121,7 +148,6 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
       fetchMemories();
       setEditMemoryId(null);
       setEditContent('');
-      setEditType('text');
     } catch (err) {
       console.error('Failed to update memory:', err);
     }
@@ -153,17 +179,90 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
     </div>
   );
 
-  if (loading) {
-    return <div>Loading memories...</div>;
-  }
+  const renderContent = () => {
+    if (!memories || loading) return null;
+
+    const currentMemories = memories.filter((memory) => {
+      switch (activeSection) {
+        case 'meta':
+          return memory.type === 'text';
+        case 'image':
+          return memory.type === 'image';
+        case 'video':
+          return memory.type === 'video';
+        default:
+          return false;
+      }
+    });
+
+    const currentNavItem = navigationItems.find(
+      (item) => item.id === activeSection,
+    );
+
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col space-y-4">
+          <p className="text-black/70 dark:text-white/70 text-sm">
+            {currentNavItem?.description}
+          </p>
+
+          {/* Memory List */}
+          <div className="w-full h-[25rem] overflow-scroll border border-light-200 dark:border-dark-200 rounded-lg hst:rounded-none p-4 overflow-y-auto">
+            {currentMemories.map((memory) => (
+              <MemoryItem key={memory.id} memory={memory} />
+            ))}
+          </div>
+
+          {/* Add/Edit Memory Form */}
+          <div className="flex flex-col space-y-2">
+            {editMemoryId === null ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder={`Add new ${activeSection} memory`}
+                  className="flex-1 px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
+                />
+                <button
+                  onClick={createMemory}
+                  className="px-6 py-2 bg-[#24A0ED] hst:bg-hst-accent text-white rounded-lg hst:rounded-none hst:hover:scale-110 hover:bg-opacity-85 transition duration-100"
+                >
+                  Add Memory
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={editContent}
+                  onChange={(e) => setEditContent(e.target.value)}
+                  placeholder="Edit memory"
+                  className="flex-1 px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
+                />
+                <button
+                  onClick={updateMemory}
+                  className="px-6 py-2 bg-[#24A0ED] hst:bg-hst-accent text-white rounded-lg hst:rounded-none hst:hover:scale-110 hover:bg-opacity-85 transition duration-100"
+                >
+                  Update
+                </button>
+                <button
+                  onClick={() => setEditMemoryId(null)}
+                  className="px-6 py-2 bg-light-secondary dark:bg-dark-secondary text-black/70 dark:text-white/70 rounded-lg hst:rounded-none border border-light-200 dark:border-dark-200"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   if (error) {
     return <div>Error: {error}</div>;
   }
-
-  const imageMemories = memories.filter((memory) => memory.type === 'image');
-  const videoMemories = memories.filter((memory) => memory.type === 'video');
-  const metaMemories = memories.filter((memory) => memory.type === 'text');
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -195,7 +294,7 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full lg:w-[1101px] transform bg-light-secondary dark:bg-dark-secondary p-6 rounded-2xl hst:rounded-none border border-light-200 dark:border-dark-200 text-left align-middle transition-all">
+              <DialogPanel className="w-full max-w-4xl transform rounded-2xl hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex justify-between items-center mb-6">
                   <DialogTitle className="text-xl font-medium text-black dark:text-white">
                     Memories
@@ -210,127 +309,38 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
                   </button>
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Meta Search Memories */}
-                  <div className="w-full">
-                    <div className="text-black/70 dark:text-white/70 text-sm font-medium">
-                      Meta Search
-                    </div>
-                    <p className="text-black/70 dark:text-white/70 text-xs font-light mb-4">
-                      Memories which affects the Meta Search, e.g.{' '}
-                      <span className="italic">
-                        Answer always in simple english
-                      </span>
-                    </p>
-                    <div className="w-full h-[15rem] lg:h-[25rem] overflow-scroll border border-light-200 dark:border-dark-200 rounded-lg hst:rounded-none p-4 overflow-y-auto">
-                      {metaMemories.map((memory) => (
-                        <MemoryItem key={memory.id} memory={memory} />
+                <div className="flex gap-8">
+                  {/* Navigation */}
+                  <div className="w-48 shrink-0">
+                    <nav className="flex flex-col space-y-1">
+                      {navigationItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveSection(item.id)}
+                          className={cn(
+                            'flex items-center space-x-3 px-3 py-2 rounded-lg hst:rounded-none text-sm font-medium transition-colors',
+                            activeSection === item.id
+                              ? 'bg-[#24A0ED] hst:bg-hst-accent text-white'
+                              : 'text-black/70 dark:text-white/70 hover:bg-light-200 dark:hover:bg-dark-200',
+                          )}
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
+                        </button>
                       ))}
-                    </div>
+                    </nav>
                   </div>
 
-                  <div className="flex flex-col gap-4 w-full lg:w-auto">
-                    {/* Image Search Memories */}
-                    <div>
-                      <div className="text-black/70 dark:text-white/70 text-sm font-medium">
-                        Image Search
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    {loading ? (
+                      <div className="w-full flex items-center justify-center py-6 text-black/70 dark:text-white/70">
+                        Loading memories...
                       </div>
-                      <p className="text-black/70 dark:text-white/70 text-xs font-light mb-4">
-                        Memories which affects the Image Search, e.g.{' '}
-                        <span className="italic">
-                          search just black white Images
-                        </span>
-                      </p>
-                      <div className="w-full lg:w-[30rem] h-[10rem] overflow-scroll border border-light-200 dark:border-dark-200 rounded-lg hst:rounded-none p-4 overflow-y-auto">
-                        {imageMemories.map((memory) => (
-                          <MemoryItem key={memory.id} memory={memory} />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Video Search Memories */}
-                    <div>
-                      <div className="text-black/70 dark:text-white/70 text-sm font-medium">
-                        Video Search
-                      </div>
-                      <p className="text-black/70 dark:text-white/70 text-xs lg:text-[0.72rem] font-light mb-4">
-                        Memories which affects the Video Search, e.g.{' '}
-                        <span className="italic">
-                          search just english-speaking videos
-                        </span>
-                      </p>
-                      <div className="w-full lg:w-[30rem] h-[10rem] overflow-scroll border border-light-200 dark:border-dark-200 rounded-lg hst:rounded-none p-4 overflow-y-auto">
-                        {videoMemories.map((memory) => (
-                          <MemoryItem key={memory.id} memory={memory} />
-                        ))}
-                      </div>
-                    </div>
+                    ) : (
+                      renderContent()
+                    )}
                   </div>
-                </div>
-
-                {/* Add/Edit Memory Form */}
-                <div className="mt-6">
-                  {editMemoryId === null ? (
-                    <div className="flex flex-col lg:flex-row gap-2">
-                      <input
-                        type="text"
-                        value={newContent}
-                        onChange={(e) => setNewContent(e.target.value)}
-                        placeholder="Enter the new memory"
-                        className="flex-1 px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
-                      />
-                      <select
-                        value={newType}
-                        onChange={(e) => setNewType(e.target.value)}
-                        className="px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
-                        title="Select memory type"
-                        aria-label="Select memory type"
-                      >
-                        <option value="text">Meta Memory</option>
-                        <option value="image">Image Memory</option>
-                        <option value="video">Video Memory</option>
-                      </select>
-                      <button
-                        onClick={createMemory}
-                        className="px-6 py-2 bg-[#24A0ED] hst:bg-hst-accent text-white rounded-lg hst:rounded-none hst:hover:scale-110 hover:bg-opacity-85 transition duration-100"
-                      >
-                        Add Memory
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col lg:flex-row gap-4">
-                      <input
-                        type="text"
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        placeholder="Edit memory content"
-                        className="flex-1 px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
-                      />
-                      <select
-                        value={editType}
-                        onChange={(e) => setEditType(e.target.value)}
-                        className="px-4 py-2 rounded-lg hst:rounded-none bg-light-secondary dark:bg-dark-secondary border border-light-200 dark:border-dark-200 dark:text-white text-sm"
-                        title="Select memory type"
-                        aria-label="Select memory type"
-                      >
-                        <option value="text">Meta Memory</option>
-                        <option value="image">Image Memory</option>
-                        <option value="video">Video Memory</option>
-                      </select>
-                      <button
-                        onClick={updateMemory}
-                        className="px-6 py-2 bg-[#24A0ED] hst:bg-hst-accent text-white rounded-lg hst:rounded-none hst:hover:scale-110 hover:bg-opacity-85 transition duration-100"
-                      >
-                        Update Memory
-                      </button>
-                      <button
-                        onClick={() => setEditMemoryId(null)}
-                        className="px-6 py-2 bg-light-secondary dark:bg-dark-secondary text-black/70 dark:text-white/70 rounded-lg hst:rounded-none border border-light-200 dark:border-dark-200"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
                 </div>
               </DialogPanel>
             </TransitionChild>

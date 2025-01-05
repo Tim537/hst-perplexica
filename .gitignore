@@ -38,3 +38,4 @@ Thumbs.db
 db.sqlite
 /searxng
 ui/.env.example
+sample.config.toml

@@ -72,8 +72,8 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                 <link.icon />
                 {link.active && (
                   <div>
-                    <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:left-[4rem]" />
-                    <div className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:right-[4.4rem]" />
+                    <div className="absolute right-0 -mr-2 h-full w-1 top-0 rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:left-[4rem]" />
+                    <div className="absolute right-0 -mr-2 h-full w-1 hidden hst:block rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:right-[4.4rem]" />
                   </div>
                 )}
                 <div
@@ -99,6 +99,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
               className="cursor-pointer hover:scale-110 transition duration-150"
             />
             <Memories isOpen={isMemoriesOpen} setIsOpen={setIsMemoriesOpen} />
+
             <Settings
               onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               className="cursor-pointer hover:scale-110 hover:rotate-90 transition duration-150"
