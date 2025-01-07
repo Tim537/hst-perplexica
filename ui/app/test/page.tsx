@@ -1,9 +1,9 @@
 'use client';
 
 import { Clock, Edit, Share } from 'lucide-react';
-import DeleteChat from '@/components/DeleteChat';
+import DeleteChat from '@/components/chat/actions/chatActions/DeleteChat';
 import { useState } from 'react';
-import Memories from '@/components/Memories';
+import Memories from '@/components/memories';
 
 const Test = () => {
   //const [chats, setChats] = useState([]);

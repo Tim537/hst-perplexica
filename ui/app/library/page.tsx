@@ -1,6 +1,6 @@
 'use client';
 
-import DeleteChat from '@/components/DeleteChat';
+import DeleteChat from '@/components/chat/actions/chatActions/DeleteChat';
 import { cn, formatTimeDifference } from '@/lib/utils';
 import { BookOpenText, ClockIcon, Delete, ScanEye } from 'lucide-react';
 import Link from 'next/link';

@@ -1,4 +1,4 @@
-import ChatWindow from '@/components/ChatWindow';
+import ChatWindow from '@/components/chat/chatComponents/chatContainer/ChatWindow';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 
