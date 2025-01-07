@@ -7,7 +7,7 @@ import {
 } from '@headlessui/react';
 import { CopyPlus, File, LoaderCircle, Plus, Trash } from 'lucide-react';
 import { Fragment, useRef, useState } from 'react';
-import { File as FileType } from '../../chatComponents/chatContainer/ChatWindow';
+import { FileType } from '@/components/chat/types';
 
 const AttachSmall = ({
   fileIds,

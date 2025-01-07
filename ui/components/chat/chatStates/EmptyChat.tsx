@@ -1,8 +1,8 @@
 import { Settings } from 'lucide-react';
 import EmptyChatMessageInput from './EmptyChatMessageInput';
-import SettingsDialog from '../../../settings';
+import SettingsDialog from '../../settings';
 import { useState } from 'react';
-import { EmptyChatProps } from '../../types';
+import { EmptyChatProps } from '../types';
 
 const EmptyChat = ({
   sendMessage,

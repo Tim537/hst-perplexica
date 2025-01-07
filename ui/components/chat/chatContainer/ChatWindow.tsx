@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Document } from '@langchain/core/documents';
-import Navbar from '../../../layout/navbar/Navbar';
+import Navbar from '../../layout/navbar/Navbar';
 import Chat from './Chat';
 import EmptyChat from '../chatStates/EmptyChat';
 import crypto from 'crypto';
@@ -23,7 +23,7 @@ import {
   ChatData,
   MessageHandlerContext,
   ChatWindowProps,
-} from '../../types';
+} from '../types';
 
 const useSocket = ({ url, setIsWSReady, setError }: WebSocketHandlerProps) => {
   const [ws, setWs] = useState<WebSocket | null>(null);

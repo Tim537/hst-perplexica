@@ -4,7 +4,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import MessageInput from '../chatMessages/MessageInput';
 import MessageBox from '../chatMessages/AssistantMessage';
 import AsisstantMessageLoading from '../chatMessages/AsisstantMessageLoading';
-import { ChatProps } from '../../types';
+import { ChatProps } from '../types';
 
 const Chat = ({
   loading,

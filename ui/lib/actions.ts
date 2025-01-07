@@ -1,4 +1,4 @@
-import { Message } from '@/components/chat/chatComponents/chatContainer/ChatWindow';
+import { Message } from '@/components/chat/types';
 
 export const getSuggestions = async (chatHisory: Message[]) => {
   const chatModel = localStorage.getItem('chatModel');

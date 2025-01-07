@@ -9,7 +9,7 @@ import {
 import { Document } from '@langchain/core/documents';
 import { File } from 'lucide-react';
 import { Fragment } from 'react';
-import { MessageSourceProps } from '../../types';
+import { MessageSourceProps } from '../types';
 
 const MessageSources = ({ sources, isOpen, setIsOpen }: MessageSourceProps) => {
   return (

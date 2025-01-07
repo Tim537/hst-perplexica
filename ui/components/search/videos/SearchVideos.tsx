@@ -3,7 +3,7 @@ import { PlayCircle, PlayIcon, PlusIcon, VideoIcon } from 'lucide-react';
 import { useState } from 'react';
 import Lightbox, { GenericSlide, VideoSlide } from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
-import { Message } from '../../chat/chatComponents/chatContainer/ChatWindow';
+import { Message } from '../../chat/chatContainer/ChatWindow';
 
 type Video = {
   url: string;

@@ -1,12 +1,12 @@
 // Base Components
-export { default as Chat } from './chatComponents/chatContainer/Chat';
-export { default as ChatWindow } from './chatComponents/chatContainer/ChatWindow';
+export { default as Chat } from './chatContainer/Chat';
+export { default as ChatWindow } from './chatContainer/ChatWindow';
 
 // Message Components
-export { default as MessageBox } from './chatComponents/chatMessages/AssistantMessage';
-export { default as MessageInput } from './chatComponents/chatMessages/MessageInput';
-export { default as MessageSources } from './chatComponents/chatMessages/MessageSources';
-export { default as AssistantMessageLoading } from './chatComponents/chatMessages/AsisstantMessageLoading';
+export { default as MessageBox } from './chatMessages/AssistantMessage';
+export { default as MessageInput } from './chatMessages/MessageInput';
+export { default as MessageSources } from './chatMessages/MessageSources';
+export { default as AssistantMessageLoading } from './chatMessages/AsisstantMessageLoading';
 
 // Message Actions
 export { default as CopyMessage } from './actions/messageActions/CopyMessage';

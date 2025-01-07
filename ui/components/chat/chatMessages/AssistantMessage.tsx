@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import React, { MutableRefObject, useEffect, useState } from 'react';
-import { Message } from '../../types';
+import { Message } from '../types';
 import { cn } from '@/lib/utils';
 import {
   ArrowRight,
@@ -23,11 +23,11 @@ import {
   Volume2,
 } from 'lucide-react';
 import Markdown from 'markdown-to-jsx';
-import CopyMessage from '../../actions/messageActions/CopyMessage';
-import RewriteMessage from '../../actions/messageActions/RewriteMessage';
+import CopyMessage from '../actions/messageActions/CopyMessage';
+import RewriteMessage from '../actions/messageActions/RewriteMessage';
 import MessageSources from './MessageSources';
-import SearchImages from '../../../search/images/SearchImages';
-import SearchVideos from '../../../search/videos/SearchVideos';
+import SearchImages from '../../search/images/SearchImages';
+import SearchVideos from '../../search/videos/SearchVideos';
 import { useSpeech } from 'react-text-to-speech';
 
 const MessageBox = ({

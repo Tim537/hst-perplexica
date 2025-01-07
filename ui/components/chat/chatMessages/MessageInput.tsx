@@ -2,10 +2,10 @@ import { cn } from '@/lib/utils';
 import { ArrowUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
-import Attach from '../../actions/inputActions/Attach';
-import CopilotToggle from '../../actions/inputActions/Copilot';
-import AttachSmall from '../../actions/inputActions/AttachSmall';
-import { MessageInputProps, InputMode } from '../../types';
+import Attach from '../actions/inputActions/Attach';
+import CopilotToggle from '../actions/inputActions/Copilot';
+import AttachSmall from '../actions/inputActions/AttachSmall';
+import { MessageInputProps, InputMode } from '../types';
 
 const MessageInput = ({
   sendMessage,
