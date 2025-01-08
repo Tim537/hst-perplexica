@@ -53,13 +53,20 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
     <div>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-20 lg:flex-col">
         <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto hst:bg-hst-accent hst:text-white bg-light-secondary dark:bg-dark-secondary hst:bg-green px-2 py-8">
-          <Link href="/">
-            <SquarePen className="cursor-pointer hover:scale-110 transition duration-150" />
-            <div className="h-[24px] w-[24px] " />
-          </Link>
+          <a
+            href="/"
+            className={cn(
+              'group relative flex flex-row items-center justify-center cursor-pointer duration-150 transition w-full py-2',
+              segments.length === 0
+                ? 'text-black dark:text-white hst:text-white'
+                : 'text-black/70 dark:text-white/70 hst:text-white/70',
+            )}
+          >
+            <SquarePen className="hover:scale-110 transition duration-150" />
+          </a>
           <VerticalIconContainer>
             {navLinks.map((link, i) => (
-              <Link
+              <a
                 key={i}
                 href={link.href}
                 className={cn(
@@ -90,7 +97,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                   transition-all duration-200 ease-out
                   hidden hst:block"
                 />
-              </Link>
+              </a>
             ))}
           </VerticalIconContainer>
           <div className="flex flex-col gap-y-8">

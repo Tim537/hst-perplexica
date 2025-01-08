@@ -3,6 +3,7 @@ import EmptyChatMessageInput from './EmptyChatMessageInput';
 import SettingsDialog from '../../settings';
 import { useState } from 'react';
 import { EmptyChatProps } from '../types';
+import AnimatedLogo from './AnimatedLogo';
 
 const EmptyChat = ({
   sendMessage,
@@ -27,8 +28,8 @@ const EmptyChat = ({
         />
       </div>
       <div className="flex flex-col items-center justify-center min-h-screen max-w-screen-sm mx-auto p-2 space-y-8">
-        <div className="hidden hst:block">
-          <img src="/hst.png" alt="hst-logo" />
+        <div className="hidden hst:block w-full animate-fade-in">
+          <AnimatedLogo />
         </div>
         <h2 className="text-black/70 dark:text-white/70 text-3xl font-medium -mt-8 hst:hidden">
           Research begins here.

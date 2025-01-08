@@ -1,5 +1,5 @@
 import { Clock, Edit, Share, Trash } from 'lucide-react';
-import { Message } from '../../chat/chatContainer/ChatWindow';
+import { Message } from '../../chat/types';
 import { useEffect, useState } from 'react';
 import { formatTimeDifference } from '@/lib/utils';
 import DeleteChat from '../../chat/actions/chatActions/DeleteChat';
