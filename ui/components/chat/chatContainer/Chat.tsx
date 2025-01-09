@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from 'react';
 import MessageInput from '../chatMessages/MessageInput';
-import MessageBox from '../chatMessages/AssistantMessage';
+import AssistantMessage from '../chatMessages/AssistantMessage';
 import AsisstantMessageLoading from '../chatMessages/AsisstantMessageLoading';
 import { ChatProps } from '../types';
 
@@ -52,7 +52,7 @@ const Chat = ({
 
         return (
           <Fragment key={msg.messageId}>
-            <MessageBox
+            <AssistantMessage
               key={i}
               message={msg}
               messageIndex={i}
