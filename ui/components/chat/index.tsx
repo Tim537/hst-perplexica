@@ -1,3 +1,6 @@
+// Types
+export * from './types';
+
 // Base Components
 export { default as Chat } from './chatContainer/Chat';
 export { default as ChatWindow } from './chatContainer/ChatWindow';
@@ -18,6 +21,3 @@ export { default as AttachSmall } from './actions/inputActions/AttachSmall';
 export { default as Copilot } from './actions/inputActions/Copilot';
 export { default as Focus } from './actions/inputActions/Focus';
 export { default as Optimization } from './actions/inputActions/Optimization';
-
-// Types and Constants
-export * from './types';

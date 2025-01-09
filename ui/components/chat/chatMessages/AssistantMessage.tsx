@@ -51,6 +51,7 @@ const MessageBox = ({
 }) => {
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
+  const [isSourcesOpen, setIsSourcesOpen] = useState(false);
 
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -99,7 +100,11 @@ const MessageBox = ({
                     Sources
                   </h3>
                 </div>
-                <MessageSources sources={message.sources} />
+                <MessageSources
+                  sources={message.sources}
+                  isOpen={isSourcesOpen}
+                  setIsOpen={setIsSourcesOpen}
+                />
               </div>
             )}
             <div className="flex flex-col space-y-2">
