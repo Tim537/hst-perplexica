@@ -9,6 +9,7 @@ import searchRouter from './search';
 import discoverRouter from './discover';
 import uploadsRouter from './uploads';
 import memoriesRouter from './memories';
+import summariesRouter from './summaries';
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use('/search', searchRouter);
 router.use('/discover', discoverRouter);
 router.use('/uploads', uploadsRouter);
 router.use('/memories', memoriesRouter);
+router.use('/summaries', summariesRouter);
 
 export default router;
