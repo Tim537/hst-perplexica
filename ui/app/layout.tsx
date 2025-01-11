@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import Sidebar from '@/components/layout/sidebar/Sidebar';
+import Sidebar from '@/components/shared/sidebar/Sidebar';
 import { Toaster } from 'sonner';
 import ThemeProvider from '@/components/theme/Provider';
 

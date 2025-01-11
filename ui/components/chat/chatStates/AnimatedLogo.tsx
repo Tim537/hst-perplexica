@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createElementSpacing } from '@/lib/utils';
 
 const AnimatedLogo = () => {
   const verticalLineRef = useRef<HTMLDivElement>(null);
@@ -10,23 +11,19 @@ const AnimatedLogo = () => {
     trier: useRef<HTMLDivElement>(null),
   };
 
-  // Helper function to create spaced text
+  // Use the new utility function for text spacing
   const createSpacedText = (
     text: string,
     pattern: number[],
     leadingSpaces: number = 0,
   ): string => {
-    let result = '\u00A0'.repeat(leadingSpaces);
     const chars = text.split('');
-    let patternIndex = 0;
-
-    for (let i = 0; i < chars.length; i++) {
-      result += chars[i];
-      if (i < chars.length - 1) {
-        result += '\u00A0'.repeat(pattern[patternIndex] || 0);
-        patternIndex = (patternIndex + 1) % pattern.length;
-      }
-    }
+    const { result } = createElementSpacing(
+      chars,
+      pattern,
+      leadingSpaces,
+      true,
+    );
     return result;
   };
 

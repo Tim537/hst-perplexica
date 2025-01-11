@@ -61,18 +61,6 @@ export interface SettingsNavigationProps {
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 /**
- * Props for the select component
- */
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  /** Options to display in the select */
-  options: {
-    value: string;
-    label: string;
-    disabled?: boolean;
-  }[];
-}
-
-/**
  * Props shared between all section components
  */
 export interface SectionProps {

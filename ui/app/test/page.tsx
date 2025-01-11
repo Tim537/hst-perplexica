@@ -1,49 +1,83 @@
 'use client';
 
-import { Clock, Edit, Share } from 'lucide-react';
-import DeleteChat from '@/components/chat/actions/chatActions/DeleteChat';
 import { useState } from 'react';
-import Memories from '@/components/memories';
+import SummaryDialog from '@/components/summaries/summaryDialog';
+import CardsDialog from '@/components/cards/cardsDialog';
+import { parseCardsData } from '@/lib/utils';
+
+// Example cards data
+const EXAMPLE_CARDS = `{
+id: 1,
+front: "1 What is AI?",
+back: "Künstliche Intelligenz beinhaltet Algorithmen und Modelle, die auf Daten trainiert werden, um bestimmte Aufgaben effizient zu erledigen. Diese Modelle können sich anhand von Beispielen verbessern und komplexe Probleme lösen"
+}
+
+{
+id: 2,
+front: "2 Welchen Arten von KI gibt es?",
+back: "Es gibt verschiedene Formen der KI, darunter: 1. Niveaugestützte KI und 2. Generalistische KI"
+}
+
+{
+id: 3,
+front: "3 Was sind die gängste Trainingsmethoden?",
+back: "1. Supervised Learning: Hierbei werden Algorithmen mit labeilerten Daten trainiert, um Muster zu erkennen."
+}
+
+{
+id: 4,
+front: "4 Welchen Arten von KI gibt es?",
+back: "Es gibt verschiedene Formen der KI, darunter: Spezialisierte und Generalistische KI"
+}
+
+{
+id: 5,
+front: "5 Was ist Reinforcement Learning?",
+back: "Reinforcement Learning ist eine Methode, bei der ein Agent lernt, wie er in einem Umgebung optimal zu handeln, indem es Belohnungen oder Strafen für bestimmte Aktionen erhält."
+}`;
 
 const Test = () => {
-  //const [chats, setChats] = useState([]);
-  const [isOpen, setIsOpen] = useState(true);
-  return (
-    /*
-    <div className="fixed z-40 top-0 left-0 right-0 px-4 lg:pl-[104px] lg:pr-6 lg:px-8 flex flex-row items-center justify-between w-full py-4 text-sm text-black dark:text-white/70 border-b bg-light-primary dark:bg-dark-primary border-light-100 dark:border-dark-200">
-      <a
-        href="/"
-        className="active:scale-95 transition duration-100 cursor-pointer lg:hidden"
-      >
-        <Edit size={17} />
-      </a>
-      <div className="hidden lg:flex flex-row items-center justify-center space-x-2">
-        <Clock size={17} />
-        <p className="text-xs">ago</p>
-      </div>
-      <p className="relative left-[8rem]">chat title</p>
+  const [isSummaryOpen, setSummaryOpen] = useState(false);
+  const [isCardsOpen, setCardsOpen] = useState(false);
 
-      <div className="relative left-[15.4rem]">
-        <Share
-          size={17}
-          className="active:scale-95 transition duration-100 cursor-pointer"
-        />
-      </div>
-      <DeleteChat chatId={''} chats={[]} setChats={() => {}} />
-    </div>
-    */
-    <>
-      <br />
-      <br />
-      <br />
-      <button onClick={() => setIsOpen(!isOpen)}>
-        {isOpen ? 'Close Memories' : 'Open Memories'}
+  // Parse example cards
+  const cards = parseCardsData(EXAMPLE_CARDS);
+
+  return (
+    <div className="p-8 space-y-4">
+      <button
+        onClick={() => setSummaryOpen(true)}
+        className="bg-[#24A0ED] text-white px-4 py-2 rounded-lg hover:bg-opacity-85 transition duration-200"
+      >
+        Open Summary Dialog
       </button>
-      <br />
-      <br />
-      <br />
-      <div>{isOpen && <Memories />}</div>
-    </>
+
+      <button
+        onClick={() => setCardsOpen(true)}
+        className="bg-[#24A0ED] text-white px-4 py-2 rounded-lg hover:bg-opacity-85 transition duration-200 block"
+      >
+        Open Cards Dialog
+      </button>
+
+      <SummaryDialog
+        mode="generate"
+        isOpen={isSummaryOpen}
+        setIsOpen={setSummaryOpen}
+        onGenerate={(content) => console.log('Generated summary:', content)}
+      />
+
+      <CardsDialog
+        mode="generate"
+        isOpen={isCardsOpen}
+        setIsOpen={setCardsOpen}
+        initialCards={cards}
+      />
+      <a href="/texteditor">
+        <button className="bg-[#24A0ED] text-white px-4 py-2 rounded-lg hover:bg-opacity-85 transition duration-200 mt-4">
+          Open Text Editor
+        </button>
+      </a>
+    </div>
   );
 };
 

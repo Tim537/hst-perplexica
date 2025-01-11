@@ -9,7 +9,6 @@ export { default as ChatWindow } from './chatContainer/ChatWindow';
 export { default as AssistantMessage } from './chatMessages/AssistantMessage';
 export { default as MessageInput } from './chatMessages/MessageInput';
 export { default as MessageSources } from './chatMessages/MessageSources';
-export { default as AssistantMessageLoading } from './chatMessages/AsisstantMessageLoading';
 
 // Message Actions
 export { default as CopyMessage } from './actions/messageActions/CopyMessage';

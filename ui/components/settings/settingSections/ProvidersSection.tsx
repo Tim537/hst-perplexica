@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SectionProps } from '../types';
 import { Input } from '../settingComponents/Input';
-import { Select } from '../settingComponents/Select';
+import { Select } from '@/components/shared/forms/Select';
 
 /**
  * Providers and Models settings section component
@@ -48,18 +48,18 @@ export const ProvidersSection = ({ config }: SectionProps) => {
             <p className="text-black/70 dark:text-white/70 text-sm">
               Chat Model Provider
             </p>
-            <Select
-              value={selectedChatModelProvider ?? undefined}
-              onChange={(e) => {
-                setSelectedChatModelProvider(e.target.value);
-                if (e.target.value === 'custom_openai') {
+            <Select<string>
+              value={selectedChatModelProvider || undefined}
+              onChange={(value) => {
+                setSelectedChatModelProvider(value);
+                if (value === 'custom_openai') {
                   setSelectedChatModel('');
                 } else {
                   setSelectedChatModel(
-                    config.chatModelProviders[e.target.value][0].name,
+                    config.chatModelProviders[value][0].name,
                   );
                 }
-                localStorage.setItem('chatModelProvider', e.target.value);
+                localStorage.setItem('chatModelProvider', value);
               }}
               options={Object.keys(config.chatModelProviders).map(
                 (provider) => ({
@@ -73,16 +73,16 @@ export const ProvidersSection = ({ config }: SectionProps) => {
 
         {/* Chat Model Selection */}
         {selectedChatModelProvider &&
-          selectedChatModelProvider != 'custom_openai' && (
+          selectedChatModelProvider !== 'custom_openai' && (
             <div className="flex flex-col space-y-1">
               <p className="text-black/70 dark:text-white/70 text-sm">
                 Chat Model
               </p>
-              <Select
-                value={selectedChatModel ?? undefined}
-                onChange={(e) => {
-                  setSelectedChatModel(e.target.value);
-                  localStorage.setItem('chatModel', e.target.value);
+              <Select<string>
+                value={selectedChatModel || undefined}
+                onChange={(value) => {
+                  setSelectedChatModel(value);
+                  localStorage.setItem('chatModel', value);
                 }}
                 options={(() => {
                   const chatModelProvider =
@@ -167,19 +167,19 @@ export const ProvidersSection = ({ config }: SectionProps) => {
             <p className="text-black/70 dark:text-white/70 text-sm">
               Embedding Model Provider
             </p>
-            <Select
-              value={selectedEmbeddingModelProvider ?? undefined}
-              onChange={(e) => {
-                setSelectedEmbeddingModelProvider(e.target.value);
+            <Select<string>
+              value={selectedEmbeddingModelProvider || undefined}
+              onChange={(value) => {
+                setSelectedEmbeddingModelProvider(value);
                 setSelectedEmbeddingModel(
-                  config.embeddingModelProviders[e.target.value][0].name,
+                  config.embeddingModelProviders[value][0].name,
                 );
-                localStorage.setItem('embeddingModelProvider', e.target.value);
+                localStorage.setItem('embeddingModelProvider', value);
               }}
               options={Object.keys(config.embeddingModelProviders).map(
                 (provider) => ({
-                  label: provider.charAt(0).toUpperCase() + provider.slice(1),
                   value: provider,
+                  label: provider.charAt(0).toUpperCase() + provider.slice(1),
                 }),
               )}
             />
@@ -192,11 +192,11 @@ export const ProvidersSection = ({ config }: SectionProps) => {
             <p className="text-black/70 dark:text-white/70 text-sm">
               Embedding Model
             </p>
-            <Select
-              value={selectedEmbeddingModel ?? undefined}
-              onChange={(e) => {
-                setSelectedEmbeddingModel(e.target.value);
-                localStorage.setItem('embeddingModel', e.target.value);
+            <Select<string>
+              value={selectedEmbeddingModel || undefined}
+              onChange={(value) => {
+                setSelectedEmbeddingModel(value);
+                localStorage.setItem('embeddingModel', value);
               }}
               options={(() => {
                 const embeddingModelProvider =
@@ -207,20 +207,20 @@ export const ProvidersSection = ({ config }: SectionProps) => {
                 return embeddingModelProvider
                   ? embeddingModelProvider.length > 0
                     ? embeddingModelProvider.map((model) => ({
-                        label: model.displayName,
                         value: model.name,
+                        label: model.displayName,
                       }))
                     : [
                         {
-                          label: 'No embedding models available',
                           value: '',
+                          label: 'No embedding models available',
                           disabled: true,
                         },
                       ]
                   : [
                       {
-                        label: 'Invalid provider, please check backend logs',
                         value: '',
+                        label: 'Invalid provider, please check backend logs',
                         disabled: true,
                       },
                     ];

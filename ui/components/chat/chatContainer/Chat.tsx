@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import MessageInput from '../chatMessages/MessageInput';
 import AssistantMessage from '../chatMessages/AssistantMessage';
-import AsisstantMessageLoading from '../chatMessages/AsisstantMessageLoading';
+import TextContentLoader from '../../shared/loadings/TextContentLoader';
 import { ChatProps } from '../types';
 
 const Chat = ({
@@ -69,7 +69,7 @@ const Chat = ({
           </Fragment>
         );
       })}
-      {loading && !messageAppeared && <AsisstantMessageLoading />}
+      {loading && !messageAppeared && <TextContentLoader />}
       <div ref={messageEnd} className="h-0" />
       {dividerWidth > 0 && (
         <div
