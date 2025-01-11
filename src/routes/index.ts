@@ -10,7 +10,7 @@ import discoverRouter from './discover';
 import uploadsRouter from './uploads';
 import memoriesRouter from './memories';
 import summariesRouter from './summaries';
-
+import cardsRouter from './cards';
 const router = express.Router();
 
 router.use('/images', imagesRouter);
@@ -24,5 +24,6 @@ router.use('/discover', discoverRouter);
 router.use('/uploads', uploadsRouter);
 router.use('/memories', memoriesRouter);
 router.use('/summaries', summariesRouter);
+router.use('/cards', cardsRouter);
 
 export default router;
