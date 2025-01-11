@@ -5,8 +5,17 @@ import { cn, calculateElementSpacing } from '@/lib/utils';
 import Tooltip from '../Tooltip';
 
 interface ToolbarProps {
-  features: EditorFeatures;
-  content: Editor | null;
+  features: Record<
+    string,
+    {
+      icon: LucideIcon;
+      label: string;
+      action: (content: any) => void;
+      tooltip: string;
+      component?: () => React.ReactNode;
+    } | null
+  >;
+  content: any;
   className?: string;
   spacing?: number[];
 }
@@ -78,16 +87,21 @@ const Toolbar = ({
           // Standard feature with icon
           const Icon = feature.icon;
           return (
-            <Tooltip key={key} text={feature.label} spacing="1.2rem">
-              <div
-                className="flex items-center justify-center w-[1.375rem] h-[1.375rem] text-black dark:text-white hover:text-[#24A0ED] dark:hover:text-[#24A0ED] hst:hover:text-hst-accent transition-colors"
-                style={{ marginRight: margins[index] }}
-                aria-label={feature.tooltip}
-                onClick={() => feature.action(content)}
-              >
-                <Icon className="w-full h-full" />
-              </div>
-            </Tooltip>
+            <div
+              key={key}
+              className="flex items-center"
+              style={{ marginRight: margins[index] }}
+            >
+              <Tooltip text={feature.label} spacing="1.2rem">
+                <div
+                  className="flex items-center justify-center w-[1.375rem] h-[1.375rem] text-black dark:text-white hover:text-[#24A0ED] dark:hover:text-[#24A0ED] hst:hover:text-hst-accent transition-colors"
+                  aria-label={feature.tooltip}
+                  onClick={() => feature.action(content)}
+                >
+                  <Icon className="w-full h-full" />
+                </div>
+              </Tooltip>
+            </div>
           );
         })}
       </div>

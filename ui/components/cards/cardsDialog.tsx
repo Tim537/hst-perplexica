@@ -73,7 +73,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
     goToPrevCard();
   };
 
-  const features = createCardsDialogFeatures();
+  const features = createCardsDialogFeatures(mode === 'generate');
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -193,8 +193,14 @@ const CardsDialog: FC<CardsDialogProps> = ({
                 </div>
 
                 {/* Toolbar */}
-                <div className="mt-6">
-                  <Toolbar features={features} content={currentCard} />
+                <div className="mt-[3rem] flex justify-center w-full">
+                  <div className="flex">
+                    <Toolbar
+                      features={features}
+                      content={currentCard}
+                      spacing={[1.5, 1.5]}
+                    />
+                  </div>
                 </div>
               </DialogPanel>
             </TransitionChild>

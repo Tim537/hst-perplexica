@@ -8,7 +8,7 @@ interface TooltipProps {
 
 const Tooltip = ({ text, children, spacing = '0.5rem' }: TooltipProps) => {
   return (
-    <div className="group relative">
+    <div className="group relative inline-block">
       {children}
       <div
         className="absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"

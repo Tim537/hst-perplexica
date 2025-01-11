@@ -53,12 +53,14 @@ export const createSummaryDialogFeatures = (hasSave = false) => ({
  * const features = createCardsDialogFeatures(false);
  */
 export const createCardsDialogFeatures = (hasSave = false) => ({
-  save: hasSave ? {
-    icon: Save,
-    label: 'Save',
-    action: saveActions.cards,
-    tooltip: 'Save cards'
-  } : null,
+  ...(hasSave ? {
+    save: {
+      icon: Save,
+      label: 'Save',
+      action: saveActions.cards,
+      tooltip: 'Save cards'
+    }
+  } : {}),
   edit: {
     icon: Pencil,
     label: 'Edit',

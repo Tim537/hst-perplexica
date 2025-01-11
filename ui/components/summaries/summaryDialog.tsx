@@ -136,8 +136,14 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                 </div>
 
                 {/* Toolbar */}
-                <div className="mt-6">
-                  <Toolbar features={features} content={content} />
+                <div className="mt-6 flex justify-center w-full">
+                  <div className="flex">
+                    <Toolbar
+                      features={features}
+                      content={content}
+                      spacing={[1.5, 1.5, 1.5]}
+                    />
+                  </div>
                 </div>
               </DialogPanel>
             </TransitionChild>
