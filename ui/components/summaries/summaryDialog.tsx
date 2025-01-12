@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import {
   Dialog,
   DialogPanel,
@@ -14,6 +14,7 @@ import { createSummaryDialogFeatures } from '../shared/toolbar/features/dialogBa
 import { useSummaryContent } from './useSummaryContent';
 import { editActions, summaryApi } from '../shared/toolbar/actions/edit';
 import { useEffect } from 'react';
+import ExportDialog from './exportDialog';
 
 /**
  * Props for the SummaryDialog component
@@ -66,6 +67,8 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   onGenerate,
   summary,
 }) => {
+  const [isExportOpen, setIsExportOpen] = useState(false);
+
   useEffect(() => {
     if (summary) {
       setContent(summary);
@@ -101,6 +104,12 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   }
   if (features.edit) {
     features.edit.action = editActions.summary;
+  }
+  if (features.export) {
+    features.export.action = async () => {
+      setIsExportOpen(true);
+      return Promise.resolve();
+    };
   }
 
   return (
@@ -182,6 +191,15 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
             </TransitionChild>
           </div>
         </div>
+
+        {/* Add ExportDialog */}
+        {summaryId && (
+          <ExportDialog
+            isOpen={isExportOpen}
+            setIsOpen={setIsExportOpen}
+            summaryId={parseInt(summaryId)}
+          />
+        )}
       </Dialog>
     </Transition>
   );

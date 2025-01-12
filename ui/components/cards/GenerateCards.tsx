@@ -1,14 +1,26 @@
-import { FileText, PlusIcon } from 'lucide-react';
+import { FileText, PlusIcon, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Message } from '../chat/types';
 import { useState } from 'react';
 import CardsDialog from './cardsDialog';
 import { CardData } from './Card';
 
-const GenerateCards = ({ message }: { message: Message }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+interface GenerateCardsProps {
+  history: Message[];
+  existingCards?: CardData[] | null;
+}
 
-  const handleGenerate = async (cards: CardData[]) => {
+const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [cards, setCards] = useState<CardData[] | null>(existingCards || null);
+  const isViewMode = Boolean(existingCards);
+
+  const handleGenerate = async (generatedCards: CardData[]) => {
+    if (isViewMode) {
+      setIsDialogOpen(true);
+      return;
+    }
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/cards/createCards`,
@@ -18,13 +30,15 @@ const GenerateCards = ({ message }: { message: Message }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            chatHistory: message.content,
-            chatId: message.chatId,
-            cards: cards,
+            chatHistory: history.map((msg) => msg.content).join('\n'),
+            chatId: history[history.length - 1].chatId,
+            cards: generatedCards,
           }),
         },
       );
-      if (res.ok) {
+      if (res.status === 200) {
+        const data = await res.json();
+        setCards(data.cards);
         toast.success('Cards generated successfully');
       } else {
         toast.error('Failed to generate cards');
@@ -41,17 +55,20 @@ const GenerateCards = ({ message }: { message: Message }) => {
         className="border border-dashed border-light-200 dark:border-dark-200 hover:bg-light-200 dark:hover:bg-dark-200 active:scale-95 duration-200 transition px-4 py-2 flex flex-row items-center justify-between rounded-lg dark:text-white text-sm w-full"
       >
         <div className="flex flex-row items-center space-x-2">
-          <FileText size={17} />
-          <p>Generate flashcards</p>
+          {isViewMode ? <Eye size={17} /> : <FileText size={17} />}
+          <p>{isViewMode ? 'View flashcards' : 'Generate flashcards'}</p>
         </div>
-        <PlusIcon className="text-[#24A0ED] hst:text-hst-accent" size={17} />
+        {!isViewMode && (
+          <PlusIcon className="text-[#24A0ED] hst:text-hst-accent" size={17} />
+        )}
       </button>
 
       <CardsDialog
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
-        mode="generate"
+        mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
+        initialCards={cards || undefined}
       />
     </>
   );

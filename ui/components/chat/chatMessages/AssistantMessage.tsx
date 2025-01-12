@@ -33,6 +33,7 @@ import { useSpeech } from 'react-text-to-speech';
 import { toast } from 'sonner';
 import GenerateSummary from '../../summaries/GenerateSummary';
 import GenerateCards from '../../cards/GenerateCards';
+import { CardData } from '../../cards/Card';
 
 const MessageBox = ({
   message,
@@ -57,6 +58,7 @@ const MessageBox = ({
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
+  const [cards, setCards] = useState<CardData[] | null>(null);
 
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -95,6 +97,20 @@ const MessageBox = ({
     if (summary === null) {
       fetchSummary();
     }
+  }, [history, summary]);
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      const chatID = history[history.length - 1].chatId;
+      const cards = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cards/${chatID}/getCards`,
+      );
+      if (cards.status === 200) {
+        const data = await cards.json();
+        setCards(data.cards);
+      }
+    };
+    fetchCards();
   }, [history]);
 
   const { speechStatus, start, stop } = useSpeech({ text: speechMessage });
@@ -232,7 +248,8 @@ const MessageBox = ({
               chatHistory={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
-            {!summary ? <GenerateSummary history={history} /> : <div>view</div>}{' '}
+            <GenerateSummary history={history} existingSummary={summary} />
+            <GenerateCards history={history} existingCards={cards} />
           </div>
         </div>
       )}
