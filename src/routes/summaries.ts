@@ -28,17 +28,11 @@ router.post('/createSummary', async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Ensure chatId is a valid number
-    const numericChatId = parseInt(chatId, 10);
-    if (isNaN(numericChatId)) {
-      return res.status(400).json({ message: 'chatId must be a number' });
-    }
-
     // Check if summary already exists for this chat
     const existingSummary = await db
       .select()
       .from(summaries)
-      .where(eq(summaries.chat, numericChatId))
+      .where(eq(summaries.chat, chatId))
       .execute();
 
     if (existingSummary.length > 0) {
@@ -54,7 +48,7 @@ router.post('/createSummary', async (req, res) => {
       .insert(summaries)
       .values({
         content: summaryContent,
-        chat: numericChatId,
+        chat: chatId,
       })
       .returning()
       .execute();
@@ -85,16 +79,11 @@ router.get('/:chatId/getSummary', async (req, res) => {
       return res.status(400).json({ message: 'Missing chatId' });
     }
 
-    const numericChatId = parseInt(chatId, 10);
-    if (isNaN(numericChatId)) {
-      return res.status(400).json({ message: 'chatId must be a number' });
-    }
-
     // Fetch summary from database
     const summary = await db
       .select()
       .from(summaries)
-      .where(eq(summaries.chat, numericChatId))
+      .where(eq(summaries.chat, chatId))
       .execute();
 
     if (summary.length === 0) {

@@ -26,17 +26,11 @@ router.post('/createStack', async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // Convert and validate chatId
-    const numericChatId = parseInt(chatId, 10);
-    if (isNaN(numericChatId)) {
-      return res.status(400).json({ message: 'chatId must be a number' });
-    }
-
     // Check for existing stack to prevent duplicates
     const existingStack = await db
       .select()
       .from(stacks)
-      .where(eq(stacks.chat, numericChatId))
+      .where(eq(stacks.chat, chatId))
       .execute();
 
     if (existingStack.length > 0) {
@@ -49,7 +43,7 @@ router.post('/createStack', async (req, res) => {
     const exampleCard = {
       front: 'Example card front',
       back: 'Example card back',
-      stackId: numericChatId,
+      stackId: chatId,
     };
 
     const cardResult = await db
@@ -57,7 +51,7 @@ router.post('/createStack', async (req, res) => {
       .values({
         front: exampleCard.front,
         back: exampleCard.back,
-        stack: numericChatId,
+        stack: chatId,
       })
       .returning()
       .execute();
@@ -67,7 +61,7 @@ router.post('/createStack', async (req, res) => {
     const exampleCard2 = {
       front: 'Second example card front',
       back: 'Second example card back',
-      stackId: numericChatId,
+      stackId: chatId,
     };
 
     const cardResult2 = await db
@@ -75,7 +69,7 @@ router.post('/createStack', async (req, res) => {
       .values({
         front: exampleCard2.front,
         back: exampleCard2.back,
-        stack: numericChatId,
+        stack: chatId,
       })
       .returning()
       .execute();
@@ -86,7 +80,7 @@ router.post('/createStack', async (req, res) => {
     const result = await db
       .insert(stacks)
       .values({
-        chat: numericChatId,
+        chat: chatId,
         cards: [newCard.id, newCard2.id],
       })
       .returning()
@@ -123,16 +117,11 @@ router.get('/:chatId/listStacksByChatId', async (req, res) => {
   try {
     const { chatId } = req.params;
 
-    const numericChatId = parseInt(chatId, 10);
-    if (isNaN(numericChatId)) {
-      return res.status(400).json({ message: 'chatId must be a number' });
-    }
-
     // Find the stack for the given chat
     const stack = await db
       .select()
       .from(stacks)
-      .where(eq(stacks.chat, numericChatId))
+      .where(eq(stacks.chat, chatId))
       .execute()
       .then((result) => result[0]);
 
