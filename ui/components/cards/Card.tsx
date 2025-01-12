@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { motion } from 'framer-motion';
 
 export interface CardData {
-  id: number;
+  id: string;
   front: string;
   back: string;
 }

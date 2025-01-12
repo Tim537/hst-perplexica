@@ -58,7 +58,7 @@ const MessageBox = ({
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
-  const [cards, setCards] = useState<CardData[] | null>(null);
+  const [cards, setCards] = useState<CardData[] | null | undefined>(null);
 
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -81,6 +81,7 @@ const MessageBox = ({
     setParsedMessage(message.content);
   }, [message.content, message.sources, message.role]);
 
+  // Summary
   useEffect(() => {
     const fetchSummary = async () => {
       const chatID = history[history.length - 1].chatId;
@@ -99,6 +100,7 @@ const MessageBox = ({
     }
   }, [history, summary]);
 
+  // Cards
   useEffect(() => {
     const fetchCards = async () => {
       const chatID = history[history.length - 1].chatId;
@@ -108,10 +110,14 @@ const MessageBox = ({
       if (cards.status === 200) {
         const data = await cards.json();
         setCards(data.cards);
+      } else {
+        setCards(null);
       }
     };
-    fetchCards();
-  }, [history]);
+    if (cards === null) {
+      fetchCards();
+    }
+  }, [history, cards]);
 
   const { speechStatus, start, stop } = useSpeech({ text: speechMessage });
 
@@ -249,7 +255,7 @@ const MessageBox = ({
               query={history[messageIndex - 1].content}
             />
             <GenerateSummary history={history} existingSummary={summary} />
-            {/* <GenerateCards history={history} existingCards={cards} /> */}
+            <GenerateCards history={history} existingCards={cards} />
           </div>
         </div>
       )}

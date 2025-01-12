@@ -19,7 +19,7 @@ interface CardsDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   mode: 'view' | 'generate';
-  initialCards?: CardData[];
+  initialCards?: CardData[] | null;
   onGenerate?: (cards: CardData[]) => void;
   cardsId?: string;
 }
@@ -69,7 +69,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
   } = useCards({ mode, cardsId, initialCards });
 
   useEffect(() => {
-    if (initialCards?.length > 0) {
+    if (initialCards && initialCards.length > 0) {
       reinitialize(initialCards);
     }
   }, [initialCards, reinitialize]);

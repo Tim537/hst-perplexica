@@ -12,7 +12,6 @@ interface GenerateCardsProps {
 
 const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [cards, setCards] = useState<CardData[] | null>(existingCards || null);
   const isViewMode = Boolean(existingCards);
 
   const handleGenerate = async (generatedCards: CardData[]) => {
@@ -38,7 +37,6 @@ const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
       );
       if (res.status === 200) {
         const data = await res.json();
-        setCards(data.cards);
         toast.success('Cards generated successfully');
       } else {
         toast.error('Failed to generate cards');
@@ -68,7 +66,7 @@ const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
         setIsOpen={setIsDialogOpen}
         mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
-        initialCards={cards || undefined}
+        initialCards={existingCards ? existingCards : []}
       />
     </>
   );
