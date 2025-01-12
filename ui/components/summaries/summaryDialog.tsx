@@ -13,6 +13,7 @@ import Toolbar from '../shared/toolbar/Toolbar';
 import { createSummaryDialogFeatures } from '../shared/toolbar/features/dialogBars';
 import { useSummaryContent } from './useSummaryContent';
 import { editActions, summaryApi } from '../shared/toolbar/actions/edit';
+import { useEffect } from 'react';
 
 /**
  * Props for the SummaryDialog component
@@ -29,6 +30,8 @@ interface SummaryDialogProps {
   summaryId?: string;
   /** Callback when a summary is generated (only used in 'generate' mode) */
   onGenerate?: (content: string) => void;
+  /** The summary to display */
+  summary?: string;
 }
 
 /**
@@ -61,7 +64,14 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   mode,
   summaryId,
   onGenerate,
+  summary,
 }) => {
+  useEffect(() => {
+    if (summary) {
+      setContent(summary);
+    }
+  });
+
   // Content management
   const { content, setContent, isLoading, error } = useSummaryContent({
     mode,

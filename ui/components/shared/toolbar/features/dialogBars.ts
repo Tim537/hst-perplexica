@@ -1,9 +1,9 @@
-import { Save, Pencil, ClipboardList, FileUp } from 'lucide-react';
+import { Save, Pencil, ClipboardList, FileUp, Copy, Download } from 'lucide-react';
 import { saveActions, editActions, copyActions, exportActions } from '../actions';
 
 /**
  * Creates a feature configuration for the summary dialog toolbar
- * @param hasSave - Whether to include the save feature in the toolbar
+ * @param isGenerateMode - Whether to include the save feature in the toolbar
  *                  Set to true to show the save button, false to hide it
  * @returns A configuration object containing all available features for the summary dialog
  * @example
@@ -13,33 +13,33 @@ import { saveActions, editActions, copyActions, exportActions } from '../actions
  * // Without save button
  * const features = createSummaryDialogFeatures(false);
  */
-export const createSummaryDialogFeatures = (hasSave = false) => ({
-  ...(hasSave ? {
-    save: {
-      icon: Save,
-      label: 'Save',
-      action: saveActions.summary,
-      tooltip: 'Save summary'
-    }
-  } : {}),
+export const createSummaryDialogFeatures = (isGenerateMode: boolean) => ({
   edit: {
     icon: Pencil,
     label: 'Edit',
     action: editActions.summary,
-    tooltip: 'Edit summary'
+    tooltip: 'Edit summary',
   },
   copy: {
-    icon: ClipboardList,
+    icon: Copy,
     label: 'Copy',
     action: copyActions.summary,
-    tooltip: 'Copy summary'
+    tooltip: 'Copy to clipboard',
   },
   export: {
-    icon: FileUp,
+    icon: Download,
     label: 'Export',
-    action: exportActions.summary,
-    tooltip: 'Export summary'
-  }
+    action: (content: any) => exportActions.summary(content, 'pdf'),
+    tooltip: 'Export summary',
+  },
+  ...(isGenerateMode && {
+    save: {
+      icon: Save,
+      label: 'Save',
+      action: saveActions.summary,
+      tooltip: 'Save summary',
+    },
+  }),
 });
 
 /**

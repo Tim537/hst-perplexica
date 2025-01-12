@@ -21,6 +21,7 @@ import {
   StopCircle,
   Video,
   Volume2,
+  FileText,
 } from 'lucide-react';
 import Markdown from 'markdown-to-jsx';
 import CopyMessage from '../actions/messageActions/CopyMessage';
@@ -29,6 +30,9 @@ import MessageSources from './MessageSources';
 import SearchImages from '../../search/images/SearchImages';
 import SearchVideos from '../../search/videos/SearchVideos';
 import { useSpeech } from 'react-text-to-speech';
+import { toast } from 'sonner';
+import GenerateSummary from '../../summaries/GenerateSummary';
+import GenerateCards from '../../cards/GenerateCards';
 
 const MessageBox = ({
   message,
@@ -52,6 +56,7 @@ const MessageBox = ({
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
 
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -73,6 +78,20 @@ const MessageBox = ({
     setSpeechMessage(message.content.replace(regex, ''));
     setParsedMessage(message.content);
   }, [message.content, message.sources, message.role]);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      const chatID = history[history.length - 1].chatId;
+      const summary = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/summaries/${chatID}/getSummary`,
+      );
+      if (summary.status === 200) {
+        const data = await summary.json();
+        setSummary(data.summary.content);
+      }
+    };
+    fetchSummary();
+  }, [history]);
 
   const { speechStatus, start, stop } = useSpeech({ text: speechMessage });
 
@@ -100,11 +119,7 @@ const MessageBox = ({
                     Sources
                   </h3>
                 </div>
-                <MessageSources
-                  sources={message.sources}
-                  isOpen={isSourcesOpen}
-                  setIsOpen={setIsSourcesOpen}
-                />
+                <MessageSources sources={message.sources} />
               </div>
             )}
             <div className="flex flex-col space-y-2">
@@ -213,6 +228,9 @@ const MessageBox = ({
               chatHistory={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
+
+            {!summary ? <GenerateSummary history={history} /> : <div>view</div>}
+            <GenerateCards message={message} />
           </div>
         </div>
       )}

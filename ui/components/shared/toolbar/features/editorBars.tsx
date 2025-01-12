@@ -32,7 +32,7 @@ const defaultIconStyle =
   'text-black hover:text-[#24A0ED] dark:text-white dark:hover:text-[#24A0ED] hst:hover:text-hst-accent';
 
 export const createSummaryEditorFeatures = (
-  backUrl: string = '/',
+  backUrl: string = '/learnit',
   editor?: EditorWithExtensions,
 ): EditorFeatures => ({
   back: {
