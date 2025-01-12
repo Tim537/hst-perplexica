@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -11,85 +12,114 @@ import { EditorWithExtensions } from '@/components/shared/toolbar/types/editor';
 import { Card, Stack } from '@/components/cards/types';
 import StackComponent from '@/components/cards/Stack';
 import CardEditor from '@/components/cards/CardEditor';
-
-// Sample data - replace with actual data from DB
-const sampleStack: Stack = {
-  id: '1',
-  name: 'Sample Stack',
-  cardIds: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
-};
-
-const sampleCards: Record<string, Card> = {
-  '1': {
-    id: '1',
-    front: 'What is artificial intelligence?',
-    back: 'Artificial intelligence (AI) is the simulation of human intelligence by machines.',
-  },
-  '2': {
-    id: '2',
-    front:
-      'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.',
-    back: 'Sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.',
-  },
-  '3': {
-    id: '3',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '4': {
-    id: '4',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '5': {
-    id: '5',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '6': {
-    id: '6',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '7': {
-    id: '7',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '8': {
-    id: '8',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-  '9': {
-    id: '9',
-    front: 'What are neural networks?',
-    back: 'Neural networks are computing systems inspired by biological neural networks that form animal brains.',
-  },
-};
+import { cardsApi } from '@/components/shared/toolbar/actions/edit';
 
 export default function CardsEditorPage() {
-  const [selectedField, setSelectedField] = useState<'front' | 'back'>('front');
+  const searchParams = useSearchParams();
+  const stackId = searchParams.get('id');
+  const content = searchParams.get('content');
+
+  const [stack, setStack] = useState<Stack | null>(null);
+  const [cards, setCards] = useState<Record<string, Card>>({});
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCardSelect = (card: Card): void => {
-    setSelectedCard(card);
-    frontEditor?.commands.setContent(card.front);
-    backEditor?.commands.setContent(card.back);
-  };
+  // Load stack data or initialize from content
+  useEffect(() => {
+    const initializeStack = async () => {
+      try {
+        setIsLoading(true);
 
-  const handleCheckboxChange = (cardId: string, checked: boolean) => {
-    const newSelected = new Set(selectedCards);
-    if (checked) {
-      newSelected.add(cardId);
-      if (!isEditMode) setIsEditMode(true);
-    } else {
-      newSelected.delete(cardId);
-      if (newSelected.size === 0) setIsEditMode(false);
+        if (stackId) {
+          // Load existing stack
+          const loadedCards = await cardsApi.load(stackId);
+          const cardsMap: Record<string, Card> = {};
+          const cardIds: string[] = [];
+
+          loadedCards.forEach((card) => {
+            cardsMap[card.id] = card;
+            cardIds.push(card.id);
+          });
+
+          setCards(cardsMap);
+          setStack({
+            id: stackId,
+            name: 'Loaded Stack',
+            cardIds: cardIds,
+          });
+        } else if (content) {
+          // Initialize new stack from content
+          try {
+            const initialCards = JSON.parse(content) as Card[];
+            const cardsMap: Record<string, Card> = {};
+            const cardIds: string[] = [];
+
+            initialCards.forEach((card) => {
+              cardsMap[card.id] = card;
+              cardIds.push(card.id);
+            });
+
+            setCards(cardsMap);
+            setStack({
+              id: 'new',
+              name: 'New Stack',
+              cardIds: cardIds,
+            });
+          } catch (parseErr) {
+            console.error('Failed to parse content:', parseErr);
+            setError('Invalid card data');
+          }
+        } else {
+          // New empty stack
+          setStack({
+            id: 'new',
+            name: 'New Stack',
+            cardIds: [],
+          });
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load stack');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeStack();
+  }, [stackId, content]);
+
+  const handleSave = async () => {
+    if (!stack) return;
+
+    try {
+      const cardsList = stack.cardIds.map((id) => cards[id]);
+      const savedCardSet = await cardsApi.save(stack.name, cardsList);
+
+      // Update local state with saved data
+      const cardsMap: Record<string, Card> = {};
+      const cardIds: string[] = [];
+
+      savedCardSet.cards.forEach((card) => {
+        cardsMap[card.id] = card;
+        cardIds.push(card.id);
+      });
+
+      setCards(cardsMap);
+      setStack((prev) =>
+        prev
+          ? {
+              ...prev,
+              id: savedCardSet.id,
+              name: savedCardSet.title,
+              cardIds,
+            }
+          : null,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save stack');
     }
-    setSelectedCards(newSelected);
   };
 
   const frontEditor = useEditor({
@@ -103,7 +133,8 @@ export default function CardsEditorPage() {
       Color,
     ],
     content: selectedCard?.front || '',
-  }) as EditorWithExtensions | null;
+    editable: true,
+  }) as EditorWithExtensions;
 
   const backEditor = useEditor({
     extensions: [
@@ -116,18 +147,77 @@ export default function CardsEditorPage() {
       Color,
     ],
     content: selectedCard?.back || '',
-  }) as EditorWithExtensions | null;
+    editable: true,
+  }) as EditorWithExtensions;
+
+  const [selectedField, setSelectedField] = useState<'front' | 'back'>('front');
+
+  const handleCardSelect = (card: Card) => {
+    setSelectedCard(card);
+    frontEditor?.commands.setContent(card.front);
+    backEditor?.commands.setContent(card.back);
+  };
+
+  const handleCheckboxChange = (cardId: string, checked: boolean) => {
+    setSelectedCards((prev) => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(cardId);
+      } else {
+        newSet.delete(cardId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleStackUpdate = async (cardSet: {
+    id: string;
+    title: string;
+    cards: Card[];
+  }) => {
+    const cardsMap: Record<string, Card> = {};
+    const cardIds: string[] = [];
+
+    cardSet.cards.forEach((card) => {
+      cardsMap[card.id] = card;
+      cardIds.push(card.id);
+    });
+
+    setCards(cardsMap);
+    setStack((prev) => (prev ? { ...prev, cardIds } : null));
+  };
+
+  if (isLoading) {
+    return <div>Loading stack...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 flex justify-center items-center h-screen">
+        {error}
+      </div>
+    );
+  }
+
+  if (!stack) {
+    return (
+      <div className="text-red-500 flex justify-center items-center h-screen">
+        No stack found
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-start p-[3.688rem] gap-2 h-fit flex-wrap lg:flex-nowrap">
       <StackComponent
-        stack={sampleStack}
-        cards={sampleCards}
+        stack={stack}
+        cards={cards}
         selectedCard={selectedCard}
         isEditMode={isEditMode}
         selectedCards={selectedCards}
         onCardSelect={handleCardSelect}
         onCheckboxChange={handleCheckboxChange}
+        onStackUpdate={handleStackUpdate}
       />
 
       <CardEditor

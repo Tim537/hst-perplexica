@@ -1,65 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pencil, FileText, Layers, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import SummaryDialog from '@/components/summaries/summaryDialog';
 import CardsDialog from '@/components/cards/cardsDialog';
-import { CardData } from '@/components/cards/Card';
+import { Card } from '@/components/cards/types';
 import { cn } from '@/lib/utils';
-import { editActions } from '@/components/shared/toolbar/actions';
+import {
+  editActions,
+  summaryApi,
+  cardsApi,
+} from '@/components/shared/toolbar/actions/edit';
 
-// Sample data - replace with actual data from DB
-const sampleSummaries = [
-  {
-    id: '1',
-    title: 'Introduction to AI',
-    content: 'AI is a fascinating field...',
-  },
-  {
-    id: '2',
-    title: 'Machine Learning Basics',
-    content: 'ML is a subset of AI...',
-  },
-];
+interface Summary {
+  id: string;
+  title: string;
+  content: string;
+}
 
-const sampleCards: Record<number, CardData> = {
-  1: {
-    id: 1,
-    front: 'What is AI?',
-    back: 'Artificial Intelligence is the simulation of human intelligence by machines.',
-  },
-  2: {
-    id: 2,
-    front: 'What is Machine Learning?',
-    back: 'Machine Learning is a subset of AI that enables systems to learn from data.',
-  },
-  3: {
-    id: 3,
-    front: 'What is Deep Learning?',
-    back: 'Deep Learning is a type of Machine Learning using neural networks with multiple layers.',
-  },
-  4: {
-    id: 4,
-    front: 'What is Supervised Learning?',
-    back: 'A type of ML where the model learns from labeled training data.',
-  },
-  5: {
-    id: 5,
-    front: 'What is Unsupervised Learning?',
-    back: 'A type of ML where the model finds patterns in unlabeled data.',
-  },
-  6: {
-    id: 6,
-    front: 'What is Reinforcement Learning?',
-    back: 'A type of ML where an agent learns to make decisions by interacting with an environment.',
-  },
-};
-
-const sampleStacks = [
-  { id: '1', name: 'AI Flashcards', cardIds: [1, 2, 3] },
-  { id: '2', name: 'ML Concepts', cardIds: [4, 5, 6] },
-];
+interface Stack {
+  id: string;
+  title: string;
+  cards: Card[];
+}
 
 type FilterType = 'all' | 'summaries' | 'flashcards';
 
@@ -71,11 +35,40 @@ export default function LearnitPage() {
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false);
 
+  const [summaries, setSummaries] = useState<Summary[]>([]);
+  const [stacks, setStacks] = useState<Stack[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        // In reality, these would be separate API endpoints
+        // For now, we'll use our existing endpoints
+        const [loadedSummaries, loadedStacks] = await Promise.all([
+          summaryApi.loadAll(), // This needs to be added to the API
+          cardsApi.loadAll(), // This needs to be added to the API
+        ]);
+
+        setSummaries(loadedSummaries);
+        setStacks(loadedStacks);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
   const showSummaries = activeFilter === 'all' || activeFilter === 'summaries';
   const showStacks = activeFilter === 'all' || activeFilter === 'flashcards';
 
   const handleEditSummary = (summaryId: string) => {
-    const summary = sampleSummaries.find((s) => s.id === summaryId);
+    const summary = summaries.find((s) => s.id === summaryId);
     if (summary) {
       editActions.summary(summary.content);
     }
@@ -85,14 +78,22 @@ export default function LearnitPage() {
     router.push(`/cardseditor?id=${stackId}`);
   };
 
-  const handleDeleteSummary = (summaryId: string) => {
-    // TODO: Implement actual deletion
-    console.log('Deleting summary:', summaryId);
+  const handleDeleteSummary = async (summaryId: string) => {
+    try {
+      await summaryApi.delete(summaryId); // This needs to be added to the API
+      setSummaries((prev) => prev.filter((s) => s.id !== summaryId));
+    } catch (err) {
+      console.error('Failed to delete summary:', err);
+    }
   };
 
-  const handleDeleteStack = (stackId: string) => {
-    // TODO: Implement actual deletion
-    console.log('Deleting stack:', stackId);
+  const handleDeleteStack = async (stackId: string) => {
+    try {
+      await cardsApi.delete(stackId); // This needs to be added to the API
+      setStacks((prev) => prev.filter((s) => s.id !== stackId));
+    } catch (err) {
+      console.error('Failed to delete stack:', err);
+    }
   };
 
   const handleCardsDialogClose = (open: boolean) => {
@@ -104,14 +105,24 @@ export default function LearnitPage() {
 
   // Get the cards for the selected stack
   const selectedStackCards = selectedStack
-    ? (() => {
-        const stack = sampleStacks.find((s) => s.id === selectedStack);
-        if (stack) {
-          return stack.cardIds.map((id) => sampleCards[id]);
-        }
-        return [];
-      })()
+    ? stacks.find((s) => s.id === selectedStack)?.cards || []
     : [];
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="p-8">
@@ -158,7 +169,7 @@ export default function LearnitPage() {
               <h2 className="text-xl font-semibold mb-4">Summaries</h2>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sampleSummaries.map((summary) => (
+              {summaries.map((summary) => (
                 <div
                   key={summary.id}
                   className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
@@ -205,7 +216,7 @@ export default function LearnitPage() {
               <h2 className="text-xl font-semibold mb-4">Flashcard Stacks</h2>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sampleStacks.map((stack) => (
+              {stacks.map((stack) => (
                 <div
                   key={stack.id}
                   className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
@@ -215,7 +226,7 @@ export default function LearnitPage() {
                   }}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{stack.name}</h3>
+                    <h3 className="font-medium">{stack.title}</h3>
                     <div className="flex gap-2">
                       <button
                         onClick={(e) => {
@@ -223,7 +234,7 @@ export default function LearnitPage() {
                           handleEditStack(stack.id);
                         }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Edit ${stack.name}`}
+                        aria-label={`Edit ${stack.title}`}
                       >
                         <Pencil className="w-4 h-4 text-[#24A0ED]" />
                       </button>
@@ -233,14 +244,14 @@ export default function LearnitPage() {
                           handleDeleteStack(stack.id);
                         }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Delete ${stack.name}`}
+                        aria-label={`Delete ${stack.title}`}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
                     </div>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    {stack.cardIds.length} cards
+                    {stack.cards.length} cards
                   </p>
                 </div>
               ))}

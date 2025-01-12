@@ -12,6 +12,7 @@ import TextContentLoader from '../shared/loadings/TextContentLoader';
 import Toolbar from '../shared/toolbar/Toolbar';
 import { createSummaryDialogFeatures } from '../shared/toolbar/features/dialogBars';
 import { useSummaryContent } from './useSummaryContent';
+import { editActions, summaryApi } from '../shared/toolbar/actions/edit';
 
 /**
  * Props for the SummaryDialog component
@@ -67,8 +68,30 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
     summaryId,
   });
 
+  const handleSave = async () => {
+    if (!content) return;
+
+    try {
+      const savedSummary = await summaryApi.save('New Summary', content);
+      if (onGenerate) {
+        onGenerate(savedSummary.content);
+      }
+      setIsOpen(false);
+    } catch (err) {
+      console.error('Failed to save summary:', err);
+    }
+  };
+
   // Toolbar configuration
   const features = createSummaryDialogFeatures(mode === 'generate');
+
+  // Override the save action if in generate mode
+  if (mode === 'generate' && features.save) {
+    features.save.action = handleSave;
+  }
+  if (features.edit) {
+    features.edit.action = editActions.summary;
+  }
 
   return (
     <Transition appear show={isOpen} as={Fragment}>

@@ -3,6 +3,7 @@ import { Card, Stack } from './types';
 import Toolbar from '../shared/toolbar/Toolbar';
 import { createStackBarFeatures } from '../shared/toolbar/features/editorBars';
 import Checkbox from '../shared/forms/Checkbox';
+import { cardsApi } from '../shared/toolbar/actions/edit';
 
 interface StackProps {
   stack: Stack;
@@ -12,6 +13,11 @@ interface StackProps {
   selectedCards: Set<string>;
   onCardSelect: (card: Card) => void;
   onCheckboxChange: (cardId: string, checked: boolean) => void;
+  onStackUpdate?: (cardSet: {
+    id: string;
+    title: string;
+    cards: Card[];
+  }) => void;
 }
 
 export default function StackComponent({
@@ -22,8 +28,26 @@ export default function StackComponent({
   selectedCards,
   onCardSelect,
   onCheckboxChange,
+  onStackUpdate,
 }: StackProps) {
+  const handleSave = async () => {
+    try {
+      const cardsList = stack.cardIds.map((id) => cards[id]);
+      const savedCardSet = await cardsApi.save(stack.name, cardsList);
+      if (onStackUpdate) {
+        onStackUpdate(savedCardSet);
+      }
+    } catch (err) {
+      console.error('Failed to save stack:', err);
+    }
+  };
+
   const stackFeatures = createStackBarFeatures('/learnit', selectedCards.size);
+
+  // Override save action
+  if (stackFeatures.save) {
+    stackFeatures.save.action = handleSave;
+  }
 
   return (
     <div className="flex flex-col gap-3.5 max-w-[25.688rem] ">

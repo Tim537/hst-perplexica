@@ -13,12 +13,15 @@ import { FlashCard, type CardData } from './Card';
 import { useCards } from './useCards';
 import Tooltip from '@/components/shared/Tooltip';
 import { motion } from 'framer-motion';
+import { cardsApi, editActions } from '../shared/toolbar/actions/edit';
 
 interface CardsDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   mode: 'view' | 'generate';
   initialCards?: CardData[];
+  onGenerate?: (cards: CardData[]) => void;
+  cardsId?: string;
 }
 
 /**
@@ -46,10 +49,11 @@ const CardsDialog: FC<CardsDialogProps> = ({
   setIsOpen,
   mode,
   initialCards = [],
+  onGenerate,
+  cardsId,
 }) => {
-  console.log('CardsDialog - Initial Cards:', initialCards);
-
   const {
+    cards,
     currentCard,
     previousCard,
     nextCard,
@@ -60,21 +64,36 @@ const CardsDialog: FC<CardsDialogProps> = ({
     direction,
     isAnimating,
     reinitialize,
-  } = useCards({ initialCards });
+    isLoading,
+    error,
+  } = useCards({ mode, cardsId, initialCards });
 
   useEffect(() => {
-    console.log('Cards changed, reinitializing...', initialCards);
-    reinitialize(initialCards);
+    if (initialCards?.length > 0) {
+      reinitialize(initialCards);
+    }
   }, [initialCards, reinitialize]);
 
-  console.log('CardsDialog - Current Card:', currentCard);
-  console.log('CardsDialog - Previous Card:', previousCard);
-  console.log('CardsDialog - Next Card:', nextCard);
+  const handleSave = async () => {
+    if (!cards.length) return;
 
-  /**
-   * Handlers for card navigation
-   * Prevent multiple clicks during animation
-   */
+    try {
+      const savedCards = await cardsApi.save('New Cards', cards);
+      if (onGenerate) {
+        onGenerate(savedCards.cards);
+      }
+      setIsOpen(false);
+    } catch (err) {
+      console.error('Failed to save cards:', err);
+    }
+  };
+
+  const handleEdit = () => {
+    if (currentCard) {
+      editActions.cards(JSON.stringify(cards));
+    }
+  };
+
   const handleNextCard = () => {
     if (isAnimating) return;
     goToNextCard();
@@ -85,7 +104,24 @@ const CardsDialog: FC<CardsDialogProps> = ({
     goToPrevCard();
   };
 
+  // Toolbar configuration
   const features = createCardsDialogFeatures(mode === 'generate');
+
+  // Override actions
+  if (mode === 'generate' && features.save) {
+    features.save.action = handleSave;
+  }
+  if (features.edit) {
+    features.edit.action = handleEdit;
+  }
+
+  if (isLoading) {
+    return <div>Loading cards...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
