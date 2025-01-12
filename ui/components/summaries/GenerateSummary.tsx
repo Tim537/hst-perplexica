@@ -18,7 +18,7 @@ const GenerateSummary = ({
     existingSummary || null,
   );
   const [isGenerating, setIsLoading] = useState(false);
-  const isViewMode = Boolean(existingSummary);
+  const [isViewMode, setIsViewMode] = useState(Boolean(existingSummary));
 
   const handleGenerate = async () => {
     if (isViewMode) {
@@ -29,6 +29,7 @@ const GenerateSummary = ({
 
     setIsLoading(true);
     setIsDialogOpen(true);
+    setIsViewMode(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/summaries/createSummary`,

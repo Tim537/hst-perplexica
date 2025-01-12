@@ -12,6 +12,28 @@ import { getAvailableChatModelProviders } from '../lib/providers';
 import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import { ChatOpenAI } from '@langchain/openai';
 
+function parseCardsFromArray(arr: string[]): Card[] {
+  const cards: Card[] = [];
+  let currentCard: Partial<Card> = {};
+
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    if (item === '<front>') {
+      currentCard.front = arr[i + 1];
+      i++; // Skip the content
+    } else if (item === '<back>') {
+      currentCard.back = arr[i + 1];
+      i++; // Skip the content
+      if (currentCard.front && currentCard.back) {
+        cards.push(currentCard as Card);
+        currentCard = {};
+      }
+    }
+  }
+
+  return cards;
+}
+
 const router = express.Router();
 
 interface Card {
@@ -115,11 +137,11 @@ router.post('/createStack', async (req, res) => {
       llm,
     );
 
-    return res.status(200).json({ cards: generatedCards });
-    /*
+    const parsedCards = parseCardsFromArray(generatedCards);
+
     const cardIds = [];
 
-    for (const card of generatedCards) {
+    for (const card of parsedCards) {
       const result = await db
         .insert(cards)
         .values({
@@ -152,10 +174,18 @@ router.post('/createStack', async (req, res) => {
       .where(inArray(cards.id, cardIds))
       .execute();
 
+    const populatedCardIds: number[] = newStack.cards as number[];
+    const populatedCardsList = await db
+      .select()
+      .from(cards)
+      .where(inArray(cards.id, populatedCardIds))
+      .execute();
+
+    newStack.cards = populatedCardsList;
+
     return res
       .status(201)
       .json({ message: 'Stack created successfully', stack: newStack });
-    */
   } catch (err) {
     res.status(500).json({ message: 'An error has occurred.' });
     logger.error(`Error creating stack: ${err.message}`);

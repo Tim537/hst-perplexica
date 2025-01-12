@@ -106,7 +106,7 @@ const MessageBox = ({
     const fetchCards = async () => {
       const chatID = history[history.length - 1].chatId;
       const cards = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/cards/${chatID}/getCards`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cards/${chatID}/listStacksByChatId`,
       );
       if (cards.status === 200) {
         const data = await cards.json();

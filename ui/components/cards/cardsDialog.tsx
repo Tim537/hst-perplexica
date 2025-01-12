@@ -22,6 +22,8 @@ interface CardsDialogProps {
   initialCards?: CardData[] | null;
   onGenerate?: (cards: CardData[]) => void;
   cardsId?: string;
+  isGenerating?: boolean;
+  cards?: CardData[] | null;
 }
 
 /**
@@ -51,6 +53,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
   initialCards = [],
   onGenerate,
   cardsId,
+  isGenerating,
 }) => {
   const {
     cards,
@@ -142,6 +145,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
                   <DialogTitle className="text-xl font-medium text-dark-primary dark:text-light-primary">
                     {mode === 'generate' ? 'Generate Cards' : 'View Cards'}
                   </DialogTitle>
+                  {isGenerating && <h1>Generating cards...</h1>}
                   <Tooltip text="Close" spacing="0.5rem">
                     <button
                       onClick={() => setIsOpen(false)}
