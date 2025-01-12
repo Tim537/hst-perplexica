@@ -1,5 +1,10 @@
 # Dokumentation der Datenbankarchitektur
 
+```
+**Github-Repository:**
+https://github.com/Tim537/hst-perplexica
+```
+
 ## Inhaltsverzeichnis
 1. [Projektübersicht](#projektübersicht)
 2. [Datenbankarchitektur](#datenbankarchitektur)
@@ -12,9 +17,7 @@
 Perplexica ist eine moderne Chat-Anwendung, die verschiedene KI-Modelle (wie LLaMA, Mixtral) integriert und erweiterte Funktionen wie Zusammenfassungen, Karteikarten und Gedächtnisspeicherung bietet. Die Anwendung besteht aus einem Frontend (Next.js) und einem Backend (Node.js) mit einer SQLite-Datenbank.
 
 ## Datenbankarchitektur
-Das Projekt verwendet SQLite mit Drizzle ORM als Datenbankschicht. 
-
-
+Das Projekt verwendet SQLite mit Drizzle ORM als Datenbankschicht.
 
 ## Notwendigkeit eines DBMS
 Die Verwendung eines Datenbankmanagementsystems (DBMS) ist aus folgenden Gründen notwendig:
@@ -32,7 +35,6 @@ Ohne ein DBMS würden folgende Probleme auftreten:
 3. **Performanceprobleme**: Ineffiziente Datenzugriffe und -abfragen
 4. **Skalierungsprobleme**: Schwierige Handhabung wachsender Datenmengen (Vor allem bei Chats)
 5. **Mangelnde Datensicherheit**: Keine eingebauten Sicherheitsmechanismen
-
 
 ## Informationsanforderungen
 Die Hauptinformationsanforderungen des Systems sind:
@@ -86,9 +88,7 @@ Das folgende ER-Modell zeigt die wichtigsten Entitäten und ihre Beziehungen:
 
 ![ERM](./ERM.svg "ERM")
 
-
 ### Funktionalität der Entitäten
-
 1. **CHAT**
    - Zentrale Entität für die Verwaltung von Konversationen
    - Speichert Metadaten wie Titel und Erstellungsdatum
@@ -114,7 +114,6 @@ Das folgende ER-Modell zeigt die wichtigsten Entitäten und ihre Beziehungen:
 6. **MEMORY**
    - Speichert verschiedene Arten von Erinnerungen
    - Unterstützt verschiedene Medientypen
-
 
 ## Relationales Schema
 Basierend auf dem ER-Modell und unter Berücksichtigung der Normalisierung ergibt sich folgendes relationales Schema:
@@ -150,9 +149,7 @@ content: string,</br>
 chat: string)
 
 ## Typische Datenbankabfragen
-
 Hier sind einige typische Abfragen, die in der Anwendung verwendet werden:
-
 1. **Alle Nachrichten eines bestimmten Chats abrufen**
 ```sql
 SELECT * FROM messages 
@@ -210,5 +207,4 @@ FROM chats c
 LEFT JOIN summaries s ON c.id = s.chat
 WHERE s.id IS NULL;
 ```
-
 

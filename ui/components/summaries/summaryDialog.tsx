@@ -157,7 +157,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
 
                   {/* Summary text area */}
                   <div className="mt-6 flex-grow">
-                    <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4">
+                    <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4 overflow-y-auto">
                       {isLoading ? (
                         <TextContentLoader
                           lines={3}
