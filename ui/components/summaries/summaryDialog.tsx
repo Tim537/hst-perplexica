@@ -70,7 +70,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
     if (summary) {
       setContent(summary);
     }
-  });
+  }, [summary]);
 
   // Content management
   const { content, setContent, isLoading, error } = useSummaryContent({

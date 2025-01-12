@@ -56,7 +56,7 @@ const MessageBox = ({
   const [parsedMessage, setParsedMessage] = useState(message.content);
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null | undefined>(null);
 
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -88,9 +88,13 @@ const MessageBox = ({
       if (summary.status === 200) {
         const data = await summary.json();
         setSummary(data.summary.content);
+      } else {
+        setSummary(undefined);
       }
     };
-    fetchSummary();
+    if (summary === null) {
+      fetchSummary();
+    }
   }, [history]);
 
   const { speechStatus, start, stop } = useSpeech({ text: speechMessage });
@@ -228,9 +232,7 @@ const MessageBox = ({
               chatHistory={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
-
-            {!summary ? <GenerateSummary history={history} /> : <div>view</div>}
-            <GenerateCards message={message} />
+            {!summary ? <GenerateSummary history={history} /> : <div>view</div>}{' '}
           </div>
         </div>
       )}

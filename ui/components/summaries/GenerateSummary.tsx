@@ -25,9 +25,9 @@ const GenerateSummary = ({ history }: { history: Message[] }) => {
           }),
         },
       );
-      if (res.status === 200) {
+      if (res.status === 200 || res.status === 201) {
         const data = await res.json();
-        setSummary(data.summary);
+        setSummary(data.summary.content);
         toast.success('Summary generated successfully');
       } else {
         toast.error('Failed to generate summary');
