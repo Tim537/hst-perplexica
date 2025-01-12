@@ -70,7 +70,7 @@ export default function LearnitPage() {
   const handleEditSummary = (summaryId: string) => {
     const summary = summaries.find((s) => s.id === summaryId);
     if (summary) {
-      editActions.summary(summary.content);
+      editActions.summary('test');
     }
   };
 

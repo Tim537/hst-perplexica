@@ -27,12 +27,15 @@ import { editorActions } from '../actions/editor';
 import { Select } from '@/components/shared/forms/Select';
 import { EditorFeatures, EditorWithExtensions } from '../types/editor';
 import { ColorPicker } from './ColorPicker';
+import { saveActions } from '../actions/save';
+import { exportActions } from '../actions/export';
 
 const defaultIconStyle =
   'text-black hover:text-[#24A0ED] dark:text-white dark:hover:text-[#24A0ED] hst:hover:text-hst-accent';
 
 export const createSummaryEditorFeatures = (
   backUrl: string = '/learnit',
+  summaryId: number,
   editor?: EditorWithExtensions,
 ): EditorFeatures => ({
   back: {
@@ -46,7 +49,10 @@ export const createSummaryEditorFeatures = (
     label: 'Save',
     tooltip: 'Save changes',
     action: () => {
-      console.log('Save clicked');
+      if (editor) {
+        const content = editor.getHTML();
+        saveActions.summary(content, summaryId);
+      }
     },
   },
   export: {
@@ -54,7 +60,7 @@ export const createSummaryEditorFeatures = (
     label: 'Export',
     tooltip: 'Export as file',
     action: () => {
-      console.log('Export clicked');
+      exportActions.summary(summaryId, 'pdf');
     },
   },
   undo: {

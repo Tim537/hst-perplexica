@@ -113,8 +113,8 @@ export const cardsApi = {
 
 // Toolbar actions
 export const editActions = {
-  summary: (content: string) => {
-    window.location.href = `/texteditor?content=${encodeURIComponent(content)}`;
+  summary: (summaryId: number) => {
+    window.location.href = `/texteditor/summary/${summaryId}`;
   },
   cards: (content: string) => {
     window.location.href = `/cardseditor?content=${encodeURIComponent(content)}`;

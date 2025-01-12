@@ -6,7 +6,6 @@ import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import Underline from '@tiptap/extension-underline';
-import { useSearchParams } from 'next/navigation';
 import Toolbar from '@/components/shared/toolbar/Toolbar';
 import { createSummaryEditorFeatures } from '@/components/shared/toolbar/features/editorBars';
 import { Select } from '@/components/shared/forms/Select';
@@ -15,6 +14,7 @@ import {
   EditorWithExtensions,
 } from '@/components/shared/toolbar/types/editor';
 import { LucideIcon } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
 
 type ToolbarFeatures = Record<
   string,
@@ -52,22 +52,91 @@ const EDITOR_TOOLBAR_SPACING = [
   0.8, // horizontal line
 ];
 
-const TextEditor = () => {
-  const searchParams = useSearchParams();
-  const initialContent = searchParams.get('content') || '';
+interface Summary {
+  id: number;
+  content: string;
+  chat: string;
+}
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      TextStyle,
-      Color,
-      Underline,
-    ],
-    content: decodeURIComponent(initialContent),
-  }) as EditorWithExtensions | null;
+const TextEditor = ({ params }: { params: { summaryId: string } }) => {
+  const [summary, setSummary] = useState<Summary>({
+    id: 0,
+    content: 'Loading...',
+    chat: '',
+  });
+  const summaryId = Number(params.summaryId);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Function to save content to backend
+  const saveContent = async (content: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/summaries/${summary.id}/updateSummary`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        },
+      );
+
+      if (!response.ok) {
+        console.error('Failed to save changes');
+      }
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchSummary = async (summaryId: Number) => {
+      const response = await fetch(
+        `http://localhost:3001/api/summaries/${summaryId}/getSummaryById`,
+      );
+      const data = await response.json();
+      setSummary(data.summary);
+    };
+    fetchSummary(summaryId);
+  }, [summaryId]);
+
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit,
+        TextAlign.configure({
+          types: ['heading', 'paragraph'],
+        }),
+        TextStyle,
+        Color,
+        Underline,
+      ],
+      content: summary.content,
+      onUpdate: ({ editor }) => {
+        const content = editor.getHTML();
+
+        // Clear any existing timeout
+        if (saveTimeoutRef.current) {
+          clearTimeout(saveTimeoutRef.current);
+        }
+
+        // Set new timeout to save after 1 second of no typing
+        saveTimeoutRef.current = setTimeout(() => {
+          saveContent(content);
+        }, 1000);
+      },
+    },
+    [summary.content],
+  ) as EditorWithExtensions | null;
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleTypeChange = (value: string) => {
     if (!editor) return;
@@ -90,6 +159,7 @@ const TextEditor = () => {
 
   const baseFeatures = createSummaryEditorFeatures(
     '/learnit',
+    summaryId,
     editor || undefined,
   );
   const features = {
@@ -134,6 +204,4 @@ const TextEditor = () => {
   );
 };
 
-export default function TextEditorPage() {
-  return <TextEditor />;
-}
+export default TextEditor;

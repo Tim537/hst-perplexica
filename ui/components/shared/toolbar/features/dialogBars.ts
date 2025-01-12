@@ -6,11 +6,11 @@ import { editActions, copyActions, exportActions } from '../actions';
  * Creates a feature configuration for the summary dialog toolbar
  * @returns A configuration object containing all available features for the summary dialog
  */
-export const createSummaryDialogFeatures = () => ({
+export const createSummaryDialogFeatures = (summaryId: number) => ({
   edit: {
     icon: Pencil,
     label: 'Edit',
-    action: editActions.summary,
+    action: () => editActions.summary(summaryId),
     tooltip: 'Edit summary',
   },
   copy: {
@@ -36,12 +36,12 @@ export const createCardsDialogFeatures = () => ({
     icon: Pencil,
     label: 'Edit',
     action: editActions.cards,
-    tooltip: 'Edit cards'
+    tooltip: 'Edit cards',
   },
   export: {
     icon: FileUp,
     label: 'Export',
     action: exportActions.cards,
-    tooltip: 'Export cards'
-  }
-}); 
+    tooltip: 'Export cards',
+  },
+});

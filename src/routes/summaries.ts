@@ -163,6 +163,40 @@ router.get('/:chatId/getSummary', async (req, res) => {
 });
 
 /**
+ * Retrieve a summary by its ID
+ * @route GET /summary/:id
+ * @param {number} id - The ID of the summary to retrieve
+ * @returns {Object} Summary object
+ */
+router.get('/:id/getSummaryById', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ID
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return res.status(400).json({ message: 'ID must be a number' });
+    }
+
+    // Fetch summary from database
+    const summary = await db
+      .select()
+      .from(summaries)
+      .where(eq(summaries.id, numericId))
+      .execute();
+
+    if (summary.length === 0) {
+      return res.status(404).json({ message: 'Summary not found' });
+    }
+
+    return res.status(200).json({ summary: summary[0] });
+  } catch (err) {
+    res.status(500).json({ message: 'An error has occurred.' });
+    logger.error(`Error retrieving summary by ID: ${err.message}`);
+  }
+});
+
+/**
  * List all summaries
  * @route GET /listSummaries
  * @returns {Object[]} Array of summary objects

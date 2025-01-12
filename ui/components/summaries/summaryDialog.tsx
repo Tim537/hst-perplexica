@@ -96,12 +96,8 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   }, [summaryData, summaryId]);
 
   // Toolbar configuration
-  const features = createSummaryDialogFeatures();
+  const features = createSummaryDialogFeatures(currentSummaryId ?? 0);
 
-  // Override the edit action
-  if (features.edit) {
-    features.edit.action = editActions.summary;
-  }
   if (features.export) {
     features.export.action = async () => {
       setIsExportOpen(true);
