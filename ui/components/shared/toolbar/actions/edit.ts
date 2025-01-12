@@ -19,8 +19,10 @@ interface Stack {
 
 // API actions for summaries
 export const summaryApi = {
-  load: async (summaryId: string): Promise<Summary> => {
-    const response = await fetch(`/api/summaries/getSummary/${summaryId}`);
+  load: async (chatId: string): Promise<Summary> => {
+    const response = await fetch(
+      `http://localhost:3001/api/summaries/${chatId}/getSummary`,
+    );
     if (!response.ok) {
       console.log(response);
       throw new Error('Failed to fetch summary');
@@ -60,7 +62,7 @@ export const summaryApi = {
     if (!response.ok) {
       throw new Error('Failed to delete summary');
     }
-  }
+  },
 };
 
 // API actions for cards
@@ -106,7 +108,7 @@ export const cardsApi = {
     if (!response.ok) {
       throw new Error('Failed to delete stack');
     }
-  }
+  },
 };
 
 // Toolbar actions
@@ -116,5 +118,5 @@ export const editActions = {
   },
   cards: (content: string) => {
     window.location.href = `/cardseditor?content=${encodeURIComponent(content)}`;
-  }
-}; 
+  },
+};

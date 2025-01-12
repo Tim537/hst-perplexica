@@ -59,7 +59,7 @@ const MessageBox = ({
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
 
-  const [cards, setCards] = useState<CardData[] | null | undefined>(null);
+  const [cards, setCards] = useState<CardData[] | null>(null);
   const [summaryId, setSummaryId] = useState<string>('');
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
@@ -113,10 +113,7 @@ const MessageBox = ({
         const data = await cards.json();
         setCards(data.cards);
       } else {
-        setCards(undefined);
-      }
-      if (cards === null) {
-        fetchCards();
+        setCards([]);
       }
     };
     if (cards === null) {
@@ -259,14 +256,12 @@ const MessageBox = ({
               chatHistory={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
-            {summaryId.length > 0 && (
-              <GenerateSummary
-                history={history}
-                existingSummary={summary}
-                existingSummaryId={summaryId}
-              />
-            )}
-            <GenerateCards history={history} existingCards={cards} />
+            <GenerateSummary
+              history={history}
+              existingSummary={summary}
+              existingSummaryId={summaryId}
+            />
+            <GenerateCards history={history} existingCards={cards || []} />
           </div>
         </div>
       )}

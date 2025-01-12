@@ -31,7 +31,6 @@ const GenerateSummary = ({
     }
 
     setIsDialogOpen(true);
-    const historyText = history.map((message) => message.content).join('\n');
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/summaries/createSummary`,
@@ -41,7 +40,7 @@ const GenerateSummary = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            chatHistory: historyText,
+            chatHistory: history,
             chatId: history[history.length - 1].chatId,
           }),
         },
@@ -81,6 +80,7 @@ const GenerateSummary = ({
         onGenerate={handleGenerate}
         summary={summary || undefined}
         summaryId={summaryId}
+        chatId={history[history.length - 1].chatId}
       />
     </>
   );

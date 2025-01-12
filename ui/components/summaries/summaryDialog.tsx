@@ -34,6 +34,7 @@ interface SummaryDialogProps {
   summary?: string;
   /** Whether the summary is loading */
   isGenerating?: boolean;
+  chatId: string;
 }
 
 /**
@@ -68,6 +69,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   onGenerate,
   summary,
   isGenerating,
+  chatId,
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [currentSummaryId, setCurrentSummaryId] = useState<number | null>(null);
@@ -76,7 +78,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   const { content, setContent, isLoading, error, summaryData } =
     useSummaryContent({
       mode,
-      summaryId,
+      chatId,
     });
 
   useEffect(() => {

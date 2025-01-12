@@ -1,9 +1,12 @@
 export const exportActions = {
   summary: async (id: number, format: 'pdf' | 'docx') => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/summaries/${id}/exportSummary?format=${format}`, {
-        method: 'GET',
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/summaries/${id}/exportSummary?format=${format}`,
+        {
+          method: 'GET',
+        },
+      );
 
       if (!response.ok) {
         throw new Error('Failed to export summary');
@@ -11,7 +14,9 @@ export const exportActions = {
 
       // Get filename from Content-Disposition header
       const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || `summary_${id}.${format}`;
+      const filename =
+        contentDisposition?.split('filename=')[1]?.replace(/"/g, '') ||
+        `summary_${id}.${format}`;
 
       // Create blob from response and trigger download
       const blob = await response.blob();
@@ -28,11 +33,14 @@ export const exportActions = {
       throw error;
     }
   },
-  cards: async (cardIds: number[]) => {
+  cards: async (cardIds: any) => {
     try {
-      const response = await fetch(`/api/cards/exportCards?cardIds=${cardIds.join(',')}`, {
-        method: 'GET',
-      });
+      const response = await fetch(
+        `http://localhost:3001/api/cards/exportCards?cardIds=${cardIds.id}`,
+        {
+          method: 'GET',
+        },
+      );
 
       if (!response.ok) {
         throw new Error('Failed to export cards');
@@ -40,7 +48,9 @@ export const exportActions = {
 
       // Get filename from Content-Disposition header
       const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || 'cards.apkg';
+      const filename =
+        contentDisposition?.split('filename=')[1]?.replace(/"/g, '') ||
+        'cards.apkg';
 
       // Create blob from response and trigger download
       const blob = await response.blob();
@@ -56,5 +66,5 @@ export const exportActions = {
       console.error('Error exporting cards:', error);
       throw error;
     }
-  }
-}; 
+  },
+};

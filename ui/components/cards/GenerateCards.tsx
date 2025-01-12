@@ -4,22 +4,28 @@ import { Message } from '../chat/types';
 import { useState } from 'react';
 import CardsDialog from './cardsDialog';
 import { CardData } from './Card';
+import { useEffect } from 'react';
 
 interface GenerateCardsProps {
   history: Message[];
-  existingCards?: CardData[] | null;
+  existingCards: CardData[];
 }
 
 const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [cards, setCards] = useState<CardData[] | null>(existingCards || null);
-  const [isViewMode, setIsViewMode] = useState(Boolean(existingCards));
+  const [cards, setCards] = useState<CardData[]>([]);
+  const [isViewMode, setIsViewMode] = useState(false);
+
+  useEffect(() => {
+    setCards(existingCards);
+    setIsViewMode(existingCards.length > 0);
+  }, [existingCards]);
 
   const handleGenerate = async () => {
     if (isViewMode) {
       setIsDialogOpen(true);
-      setCards(existingCards ? existingCards : null);
+      setCards(existingCards);
       return;
     }
 
