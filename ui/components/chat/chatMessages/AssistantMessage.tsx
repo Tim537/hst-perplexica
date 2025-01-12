@@ -249,7 +249,7 @@ const MessageBox = ({
               query={history[messageIndex - 1].content}
             />
             <GenerateSummary history={history} existingSummary={summary} />
-            <GenerateCards history={history} existingCards={cards} />
+            {/* <GenerateCards history={history} existingCards={cards} /> */}
           </div>
         </div>
       )}

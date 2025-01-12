@@ -69,17 +69,17 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
-  useEffect(() => {
-    if (summary) {
-      setContent(summary);
-    }
-  }, [summary]);
-
   // Content management
   const { content, setContent, isLoading, error } = useSummaryContent({
     mode,
     summaryId,
   });
+
+  useEffect(() => {
+    if (summary) {
+      setContent(summary);
+    }
+  }, [summary, setContent]);
 
   const handleSave = async () => {
     if (!content) return;

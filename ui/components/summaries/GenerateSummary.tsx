@@ -22,6 +22,7 @@ const GenerateSummary = ({
   const handleGenerate = async () => {
     if (isViewMode) {
       setIsDialogOpen(true);
+      setSummary(existingSummary ? existingSummary : null);
       return;
     }
 
