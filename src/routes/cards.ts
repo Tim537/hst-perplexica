@@ -46,11 +46,25 @@ router.post('/createStack', async (req, res) => {
 
     const newCard = cardResult[0];
 
+    const exampleCard2 = {
+      front: 'Second example card front',
+      back: 'Second example card back',
+      stackId: numericChatId,
+    };
+
+    const cardResult2 = await db
+      .insert(cards)
+      .values(exampleCard2)
+      .returning()
+      .execute();
+
+    const newCard2 = cardResult2[0];
+
     const result = await db
       .insert(stacks)
       .values({
         chatId: numericChatId,
-        cardIds: JSON.stringify([newCard.id]),
+        cardIds: [newCard.id, newCard2.id],
       })
       .returning()
       .execute();
