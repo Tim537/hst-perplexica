@@ -74,20 +74,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
     }
   }, [initialCards, reinitialize]);
 
-  const handleSave = async () => {
-    if (!cards.length) return;
-
-    try {
-      const savedCards = await cardsApi.save('New Cards', cards);
-      if (onGenerate) {
-        onGenerate(savedCards.cards);
-      }
-      setIsOpen(false);
-    } catch (err) {
-      console.error('Failed to save cards:', err);
-    }
-  };
-
   const handleEdit = () => {
     if (currentCard) {
       editActions.cards(JSON.stringify(cards));
@@ -105,12 +91,9 @@ const CardsDialog: FC<CardsDialogProps> = ({
   };
 
   // Toolbar configuration
-  const features = createCardsDialogFeatures(mode === 'generate');
+  const features = createCardsDialogFeatures();
 
-  // Override actions
-  if (mode === 'generate' && features.save) {
-    features.save.action = handleSave;
-  }
+  // Override edit action
   if (features.edit) {
     features.edit.action = handleEdit;
   }

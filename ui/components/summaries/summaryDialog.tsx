@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import {
   Dialog,
   DialogPanel,
@@ -13,7 +13,6 @@ import Toolbar from '../shared/toolbar/Toolbar';
 import { createSummaryDialogFeatures } from '../shared/toolbar/features/dialogBars';
 import { useSummaryContent } from './useSummaryContent';
 import { editActions, summaryApi } from '../shared/toolbar/actions/edit';
-import { useEffect } from 'react';
 import ExportDialog from './exportDialog';
 
 /**
@@ -81,27 +80,10 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
     }
   }, [summary, setContent]);
 
-  const handleSave = async () => {
-    if (!content) return;
-
-    try {
-      const savedSummary = await summaryApi.save('New Summary', content);
-      if (onGenerate) {
-        onGenerate(savedSummary.content);
-      }
-      setIsOpen(false);
-    } catch (err) {
-      console.error('Failed to save summary:', err);
-    }
-  };
-
   // Toolbar configuration
-  const features = createSummaryDialogFeatures(mode === 'generate');
+  const features = createSummaryDialogFeatures();
 
-  // Override the save action if in generate mode
-  if (mode === 'generate' && features.save) {
-    features.save.action = handleSave;
-  }
+  // Override the edit action
   if (features.edit) {
     features.edit.action = editActions.summary;
   }
@@ -113,95 +95,99 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   }
 
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-50"
-        onClose={() => setIsOpen(false)}
-      >
-        <TransitionChild
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+    <>
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setIsOpen(false)}
         >
-          <div className="fixed inset-0 bg-light-primary/50 dark:bg-dark-primary/50" />
-        </TransitionChild>
+          <TransitionChild
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-light-primary/50 dark:bg-dark-primary/50" />
+          </TransitionChild>
 
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <TransitionChild
-              as={Fragment}
-              enter="ease-out duration-200"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-100"
-              leaveFrom="opacity-100 scale-200"
-              leaveTo="opacity-0 scale-95"
-            >
-              <DialogPanel className="w-full max-w-[47.938rem] transform flex flex-col justify-between rounded-[1.25rem] hst:rounded-none bg-light-primary dark:bg-dark-primary border border-[#E7E7E7] dark:border-dark-200 p-6 text-left align-middle shadow-[0_0.25rem_0.25rem_rgba(0,0,0,0.25)] transition-all">
-                {/* Dialog header */}
-                <div className="flex justify-between items-center">
-                  <DialogTitle className="text-xl font-medium text-black dark:text-white hst:text-white">
-                    {mode === 'generate' ? 'Generate Summary' : 'View Summary'}
-                  </DialogTitle>
-                  <Tooltip text="Close" spacing="0.5rem">
-                    <button
-                      onClick={() => setIsOpen(false)}
-                      className="text-[#757573] hover:text-[#454545] dark:hover:text-white hst:text-white/70 hst:hover:text-white/40 transition-colors"
-                      aria-label="Close dialog"
-                    >
-                      <X className="w-6 h-6" />
-                    </button>
-                  </Tooltip>
-                </div>
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <TransitionChild
+                as={Fragment}
+                enter="ease-out duration-200"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-100"
+                leaveFrom="opacity-100 scale-200"
+                leaveTo="opacity-0 scale-95"
+              >
+                <DialogPanel className="w-full max-w-[47.938rem] transform flex flex-col justify-between rounded-[1.25rem] hst:rounded-none bg-light-primary dark:bg-dark-primary border border-[#E7E7E7] dark:border-dark-200 p-6 text-left align-middle shadow-[0_0.25rem_0.25rem_rgba(0,0,0,0.25)] transition-all">
+                  {/* Dialog header */}
+                  <div className="flex justify-between items-center">
+                    <DialogTitle className="text-xl font-medium text-black dark:text-white hst:text-white">
+                      {mode === 'generate'
+                        ? 'Generate Summary'
+                        : 'View Summary'}
+                    </DialogTitle>
+                    <Tooltip text="Close" spacing="0.5rem">
+                      <button
+                        onClick={() => setIsOpen(false)}
+                        className="text-[#757573] hover:text-[#454545] dark:hover:text-white hst:text-white/70 hst:hover:text-white/40 transition-colors"
+                        aria-label="Close dialog"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                    </Tooltip>
+                  </div>
 
-                {/* Summary text area */}
-                <div className="mt-6 flex-grow">
-                  <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4">
-                    {isLoading ? (
-                      <TextContentLoader
-                        lines={3}
-                        lineWidths={['100%', '75%', '85%']}
-                        fullWidth
-                        className="bg-transparent"
+                  {/* Summary text area */}
+                  <div className="mt-6 flex-grow">
+                    <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4 overflow-y-auto">
+                      {isLoading ? (
+                        <TextContentLoader
+                          lines={3}
+                          lineWidths={['100%', '75%', '85%']}
+                          fullWidth
+                          className="bg-transparent"
+                        />
+                      ) : error ? (
+                        <div className="text-red-500">{error}</div>
+                      ) : (
+                        <div>{content}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Toolbar */}
+                  <div className="mt-6 flex justify-center w-full">
+                    <div className="flex">
+                      <Toolbar
+                        features={features}
+                        content={content}
+                        spacing={[1.5, 1.5, 1.5]}
                       />
-                    ) : error ? (
-                      <div className="text-red-500">{error}</div>
-                    ) : (
-                      <div>{content}</div>
-                    )}
+                    </div>
                   </div>
-                </div>
-
-                {/* Toolbar */}
-                <div className="mt-6 flex justify-center w-full">
-                  <div className="flex">
-                    <Toolbar
-                      features={features}
-                      content={content}
-                      spacing={[1.5, 1.5, 1.5]}
-                    />
-                  </div>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
+                </DialogPanel>
+              </TransitionChild>
+            </div>
           </div>
-        </div>
+        </Dialog>
+      </Transition>
 
-        {/* Add ExportDialog */}
-        {summaryId && (
-          <ExportDialog
-            isOpen={isExportOpen}
-            setIsOpen={setIsExportOpen}
-            summaryId={parseInt(summaryId)}
-          />
-        )}
-      </Dialog>
-    </Transition>
+      {/* Export Dialog */}
+      {summaryId && (
+        <ExportDialog
+          isOpen={isExportOpen}
+          setIsOpen={setIsExportOpen}
+          summaryId={parseInt(summaryId)}
+        />
+      )}
+    </>
   );
 };
 
