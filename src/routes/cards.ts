@@ -6,8 +6,31 @@ import { eq, inArray, sql } from 'drizzle-orm';
 import AnkiExport from 'anki-apkg-export';
 import fs from 'fs';
 import path from 'path';
+import generateCards from '../chains/cardGeneratorAgent';
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { getAvailableChatModelProviders } from '../lib/providers';
+import { HumanMessage, AIMessage } from '@langchain/core/messages';
+import { ChatOpenAI } from '@langchain/openai';
 
 const router = express.Router();
+
+interface Card {
+  front: string;
+  back: string;
+}
+
+interface ChatModel {
+  provider: string;
+  model: string;
+  customOpenAIBaseURL?: string;
+  customOpenAIKey?: string;
+}
+
+interface SuggestionsBody {
+  chatHistory: any[];
+  chatModel?: ChatModel;
+  chatId: string;
+}
 
 /**
  * Creates a new flashcard stack associated with a chat.
@@ -20,9 +43,9 @@ const router = express.Router();
  */
 router.post('/createStack', async (req, res) => {
   try {
-    const { chatHistory, chatId } = req.body;
+    let body: SuggestionsBody = req.body;
 
-    if (!chatHistory || !chatId) {
+    if (!body.chatHistory || !body.chatId) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -30,7 +53,7 @@ router.post('/createStack', async (req, res) => {
     const existingStack = await db
       .select()
       .from(stacks)
-      .where(eq(stacks.chat, chatId))
+      .where(eq(stacks.chat, body.chatId))
       .execute();
 
     if (existingStack.length > 0) {
@@ -39,49 +62,83 @@ router.post('/createStack', async (req, res) => {
         .json({ message: 'A stack for this chat already exists.' });
     }
 
-    // Create example cards (TODO: Replace with actual card generation from chat history)
-    const exampleCard = {
-      front: 'Example card front',
-      back: 'Example card back',
-      stackId: chatId,
-    };
+    const chatHistory = body.chatHistory.map((msg: any) => {
+      if (msg.role === 'user') {
+        return new HumanMessage(msg.content);
+      } else if (msg.role === 'assistant') {
+        return new AIMessage(msg.content);
+      }
+    });
 
-    const cardResult = await db
-      .insert(cards)
-      .values({
-        front: exampleCard.front,
-        back: exampleCard.back,
-        stack: chatId,
-      })
-      .returning()
-      .execute();
+    const chatModelProviders = await getAvailableChatModelProviders();
 
-    const newCard = cardResult[0];
+    const chatModelProvider =
+      body.chatModel?.provider || Object.keys(chatModelProviders)[0];
+    const chatModel =
+      body.chatModel?.model ||
+      Object.keys(chatModelProviders[chatModelProvider])[0];
 
-    const exampleCard2 = {
-      front: 'Second example card front',
-      back: 'Second example card back',
-      stackId: chatId,
-    };
+    let llm: BaseChatModel | undefined;
 
-    const cardResult2 = await db
-      .insert(cards)
-      .values({
-        front: exampleCard2.front,
-        back: exampleCard2.back,
-        stack: chatId,
-      })
-      .returning()
-      .execute();
+    if (body.chatModel?.provider === 'custom_openai') {
+      if (
+        !body.chatModel?.customOpenAIBaseURL ||
+        !body.chatModel?.customOpenAIKey
+      ) {
+        return res
+          .status(400)
+          .json({ message: 'Missing custom OpenAI base URL or key' });
+      }
 
-    const newCard2 = cardResult2[0];
+      llm = new ChatOpenAI({
+        modelName: body.chatModel.model,
+        openAIApiKey: body.chatModel.customOpenAIKey,
+        temperature: 0.7,
+        configuration: {
+          baseURL: body.chatModel.customOpenAIBaseURL,
+        },
+      }) as unknown as BaseChatModel;
+    } else if (
+      chatModelProviders[chatModelProvider] &&
+      chatModelProviders[chatModelProvider][chatModel]
+    ) {
+      llm = chatModelProviders[chatModelProvider][chatModel]
+        .model as unknown as BaseChatModel | undefined;
+    }
+
+    if (!llm) {
+      return res.status(400).json({ message: 'Invalid model selected' });
+    }
+
+    const generatedCards: any = await generateCards(
+      { chat_history: chatHistory },
+      llm,
+    );
+
+    return res.status(200).json({ cards: generatedCards });
+    /*
+    const cardIds = [];
+
+    for (const card of generatedCards) {
+      const result = await db
+        .insert(cards)
+        .values({
+          front: card.front,
+          back: card.back,
+          stack: 0,
+        })
+        .returning()
+        .execute();
+
+      cardIds.push(result[0].id);
+    }
 
     // Create the stack with references to the cards
     const result = await db
       .insert(stacks)
       .values({
-        chat: chatId,
-        cards: [newCard.id, newCard2.id],
+        chat: body.chatId,
+        cards: cardIds,
       })
       .returning()
       .execute();
@@ -92,12 +149,13 @@ router.post('/createStack', async (req, res) => {
     await db
       .update(cards)
       .set({ stack: newStack.id })
-      .where(inArray(cards.id, [newCard.id, newCard2.id]))
+      .where(inArray(cards.id, cardIds))
       .execute();
 
     return res
       .status(201)
       .json({ message: 'Stack created successfully', stack: newStack });
+    */
   } catch (err) {
     res.status(500).json({ message: 'An error has occurred.' });
     logger.error(`Error creating stack: ${err.message}`);

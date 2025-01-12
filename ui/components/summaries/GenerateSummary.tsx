@@ -17,6 +17,7 @@ const GenerateSummary = ({
   const [summary, setSummary] = useState<string | null>(
     existingSummary || null,
   );
+  const [isGenerating, setIsLoading] = useState(false);
   const isViewMode = Boolean(existingSummary);
 
   const handleGenerate = async () => {
@@ -26,8 +27,8 @@ const GenerateSummary = ({
       return;
     }
 
+    setIsLoading(true);
     setIsDialogOpen(true);
-    const historyText = history.map((message) => message.content).join('\n');
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/summaries/createSummary`,
@@ -37,20 +38,22 @@ const GenerateSummary = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            chatHistory: historyText,
+            chatHistory: history,
             chatId: history[history.length - 1].chatId,
           }),
         },
       );
       if (res.status === 200 || res.status === 201) {
         const data = await res.json();
-        setSummary(data.summary.content);
+        setSummary(data.summary);
         toast.success('Summary generated successfully');
       } else {
         toast.error('Failed to generate summary');
       }
+      setIsLoading(false);
     } catch (error) {
       toast.error('Failed to generate summary');
+      setIsLoading(false);
     }
   };
 
@@ -75,6 +78,7 @@ const GenerateSummary = ({
         mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
         summary={summary || undefined}
+        isGenerating={isGenerating}
       />
     </>
   );

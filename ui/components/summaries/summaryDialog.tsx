@@ -32,6 +32,8 @@ interface SummaryDialogProps {
   onGenerate?: (content: string) => void;
   /** The summary to display */
   summary?: string;
+  /** Whether the summary is loading */
+  isGenerating?: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   summaryId,
   onGenerate,
   summary,
+  isGenerating,
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
 
@@ -146,7 +149,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
 
                   {/* Summary text area */}
                   <div className="mt-6 flex-grow">
-                    <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4 overflow-y-auto">
+                    <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4">
                       {isLoading ? (
                         <TextContentLoader
                           lines={3}
@@ -156,6 +159,8 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                         />
                       ) : error ? (
                         <div className="text-red-500">{error}</div>
+                      ) : isGenerating ? (
+                        <div>Generating...</div>
                       ) : (
                         <div>{content}</div>
                       )}

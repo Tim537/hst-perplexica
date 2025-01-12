@@ -58,6 +58,7 @@ const MessageBox = ({
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
+
   const [cards, setCards] = useState<CardData[] | null | undefined>(null);
 
   useEffect(() => {
@@ -111,7 +112,10 @@ const MessageBox = ({
         const data = await cards.json();
         setCards(data.cards);
       } else {
-        setCards(null);
+        setCards(undefined);
+      }
+      if (cards === null) {
+        fetchCards();
       }
     };
     if (cards === null) {
