@@ -1,6 +1,5 @@
 import clsx, { ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type { CardData } from '../components/cards/Card';
 
 export const cn = (...classes: ClassValue[]) => twMerge(clsx(...classes));
 
@@ -25,35 +24,6 @@ export const formatTimeDifference = (
     return `${Math.floor(diffInSeconds / 86400)} day${Math.floor(diffInSeconds / 86400) !== 1 ? 's' : ''}`;
   else
     return `${Math.floor(diffInSeconds / 31536000)} year${Math.floor(diffInSeconds / 31536000) !== 1 ? 's' : ''}`;
-};
-
-/**
- * Parses raw text into an array of CardData objects
- * 
- * @param rawText - The raw text to parse
- * @returns An record of CardData objects
- */
-export const parseCardsData = (rawText: string): CardData[] => {
-  const cards: CardData[] = [];
-  const cardBlocks = rawText.split('\n\n');
-  
-  for (const block of cardBlocks) {
-    if (!block.trim()) continue;
-    
-    const idMatch = block.match(/id:\s*(\d+)/);
-    const frontMatch = block.match(/front:\s*"([^"]*)"/);
-    const backMatch = block.match(/back:\s*"([^"]*)"/);
-    
-    if (idMatch && frontMatch && backMatch) {
-      cards.push({
-        id: parseInt(idMatch[1]),
-        front: frontMatch[1].trim(),
-        back: backMatch[1].trim()
-      });
-    }
-  }
-  
-  return cards;
 };
 
 /**

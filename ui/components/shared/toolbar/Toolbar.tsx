@@ -13,6 +13,7 @@ interface ToolbarProps {
       action: (content: any) => void;
       tooltip: string;
       component?: () => React.ReactNode;
+      className?: string;
     } | null
   >;
   content: any;
@@ -20,34 +21,14 @@ interface ToolbarProps {
   spacing?: number[];
 }
 
+const defaultIconStyle =
+  'text-black hover:text-[#24A0ED] dark:text-white dark:hover:text-[#24A0ED] hst:hover:text-hst-accent hover:cursor-pointer';
+
 const Toolbar = ({
   features,
   content,
   className,
-  spacing = [
-    0.8, // back
-    0.8, // save
-    2, // export
-
-    0.8, // undo
-    1.5, // redo
-
-    1.2, // type
-
-    0.8, // bold
-    0.8, // italic
-    0.8, // underline
-    2.5, // color
-
-    0.8, // left
-    0.8, // center
-    0.8, // right
-    2.5, // justify
-
-    0.8, // ordered list
-    0.8, // unordered list
-    0.8, // horizontal line
-  ],
+  spacing = [],
 }: ToolbarProps) => {
   const featureEntries = Object.entries(features);
   const margins = calculateElementSpacing(
@@ -94,7 +75,10 @@ const Toolbar = ({
             >
               <Tooltip text={feature.label} spacing="1.2rem">
                 <div
-                  className="flex items-center justify-center w-[1.375rem] h-[1.375rem] text-black dark:text-white hover:text-[#24A0ED] dark:hover:text-[#24A0ED] hst:hover:text-hst-accent transition-colors"
+                  className={cn(
+                    'flex items-center justify-center w-[1.375rem] h-[1.375rem] transition-colors',
+                    feature.className || defaultIconStyle,
+                  )}
                   aria-label={feature.tooltip}
                   onClick={() => feature.action(content)}
                 >

@@ -1,5 +1,19 @@
 import { useState, useEffect } from 'react';
 
+// Sample data - this should be replaced with actual DB data later
+const sampleSummaries = [
+  {
+    id: '1',
+    title: 'Introduction to AI',
+    content: 'AI is a fascinating field...',
+  },
+  {
+    id: '2',
+    title: 'Machine Learning Basics',
+    content: 'ML is a subset of AI...',
+  },
+];
+
 /**
  * Props for the useSummaryContent hook
  * @interface UseSummaryContentProps
@@ -44,13 +58,13 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
       try {
         setIsLoading(true);
         if (mode === 'view' && summaryId) {
-          // TODO: Implement DB fetch logic
-          // const summary = await fetchSummaryFromDB(summaryId);
-          // setContent(summary.content);
-          setContent("Example stored summary"); // Placeholder
+          const summary = sampleSummaries.find(s => s.id === summaryId);
+          if (summary) {
+            setContent(summary.content);
+          } else {
+            setError('Summary not found');
+          }
         } else if (mode === 'generate') {
-          // TODO: Implement generation logic
-          // Will be populated by the generation process
           setContent(null);
         }
       } catch (err) {

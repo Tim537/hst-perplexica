@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import {
   Dialog,
   DialogPanel,
@@ -47,6 +47,8 @@ const CardsDialog: FC<CardsDialogProps> = ({
   mode,
   initialCards = [],
 }) => {
+  console.log('CardsDialog - Initial Cards:', initialCards);
+
   const {
     currentCard,
     previousCard,
@@ -57,7 +59,17 @@ const CardsDialog: FC<CardsDialogProps> = ({
     currentIndex,
     direction,
     isAnimating,
+    reinitialize,
   } = useCards({ initialCards });
+
+  useEffect(() => {
+    console.log('Cards changed, reinitializing...', initialCards);
+    reinitialize(initialCards);
+  }, [initialCards, reinitialize]);
+
+  console.log('CardsDialog - Current Card:', currentCard);
+  console.log('CardsDialog - Previous Card:', previousCard);
+  console.log('CardsDialog - Next Card:', nextCard);
 
   /**
    * Handlers for card navigation

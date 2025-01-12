@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import type { CardData } from './Card';
-import { parseCardsData } from '../../lib/utils';
 
 interface CardsState {
   cards: Record<number, CardData>;     // Map of card ID to card data
@@ -20,6 +19,8 @@ interface UseCardsProps {
  * @param initialCards - Array of cards to initialize the state with
  */	
 export const useCards = ({ initialCards = [] }: UseCardsProps) => {
+  console.log('useCards - Initial Cards:', initialCards);
+  
   const [state, setState] = useState<CardsState>(() => {
     const cards = initialCards.reduce((acc, card) => {
       acc[card.id] = card;
@@ -27,6 +28,9 @@ export const useCards = ({ initialCards = [] }: UseCardsProps) => {
     }, {} as Record<number, CardData>);
 
     const orderedIds = initialCards.map(card => card.id);
+    
+    console.log('useCards - Processed Cards:', cards);
+    console.log('useCards - Ordered IDs:', orderedIds);
     
     return {
       cards,
@@ -36,6 +40,26 @@ export const useCards = ({ initialCards = [] }: UseCardsProps) => {
       isAnimating: false
     };
   });
+
+  const reinitialize = useCallback((newCards: CardData[]) => {
+    console.log('Reinitializing with cards:', newCards);
+    setState(() => {
+      const cards = newCards.reduce((acc, card) => {
+        acc[card.id] = card;
+        return acc;
+      }, {} as Record<number, CardData>);
+
+      const orderedIds = newCards.map(card => card.id);
+      
+      return {
+        cards,
+        orderedIds,
+        currentId: orderedIds[0] || 0,
+        direction: 'right',
+        isAnimating: false
+      };
+    });
+  }, []);
 
   const setIsAnimating = useCallback((value: boolean) => {
     setState(prev => ({ ...prev, isAnimating: value }));
@@ -116,6 +140,7 @@ export const useCards = ({ initialCards = [] }: UseCardsProps) => {
     totalCards: state.orderedIds.length,
     currentIndex,
     direction: state.direction,
-    isAnimating: state.isAnimating
+    isAnimating: state.isAnimating,
+    reinitialize
   };
 }; 

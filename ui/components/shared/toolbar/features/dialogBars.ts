@@ -14,12 +14,14 @@ import { saveActions, editActions, copyActions, exportActions } from '../actions
  * const features = createSummaryDialogFeatures(false);
  */
 export const createSummaryDialogFeatures = (hasSave = false) => ({
-  save: hasSave ? {
-    icon: Save,
-    label: 'Save',
-    action: saveActions.summary,
-    tooltip: 'Save summary'
-  } : null,
+  ...(hasSave ? {
+    save: {
+      icon: Save,
+      label: 'Save',
+      action: saveActions.summary,
+      tooltip: 'Save summary'
+    }
+  } : {}),
   edit: {
     icon: Pencil,
     label: 'Edit',

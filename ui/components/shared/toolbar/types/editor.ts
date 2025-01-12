@@ -8,26 +8,11 @@ export interface EditorFeature {
   tooltip: string;
   action: (editor?: EditorWithExtensions) => void;
   component?: () => ReactNode;
+  className?: string;
 }
 
 export interface EditorFeatures {
-  back: EditorFeature;
-  save: EditorFeature;
-  export: EditorFeature;
-  undo: EditorFeature;
-  redo: EditorFeature;
-  type: EditorFeature;
-  bold: EditorFeature;
-  italic: EditorFeature;
-  underline: EditorFeature;
-  textColor: EditorFeature;
-  alignLeft: EditorFeature;
-  alignCenter: EditorFeature;
-  alignRight: EditorFeature;
-  alignJustify: EditorFeature;
-  bulletList: EditorFeature;
-  orderedList: EditorFeature;
-  horizontalRule: EditorFeature;
+  [key: string]: EditorFeature;
 }
 
 export type EditorWithExtensions = Editor & {
@@ -37,6 +22,7 @@ export type EditorWithExtensions = Editor & {
       toggleItalic: () => { run: () => void };
       toggleUnderline: () => { run: () => void };
       setColor: (color: string) => { run: () => void };
+      unsetColor: () => { run: () => void };
       toggleHeading: (options: { level: number }) => { run: () => void };
       setTextAlign: (align: 'left' | 'center' | 'right' | 'justify') => { run: () => void };
       toggleBulletList: () => { run: () => void };
@@ -47,4 +33,7 @@ export type EditorWithExtensions = Editor & {
       setParagraph: () => { run: () => void };
     };
   };
+  getAttributes: (type: string) => Record<string, any>;
+  on: (event: string, handler: () => void) => void;
+  off: (event: string, handler: () => void) => void;
 }; 

@@ -68,7 +68,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
               },
               {
                 icon: GraduationCap,
-                href: '/test',
+                href: '/learnit',
                 active: segments.includes('test'),
                 label: 'Learn',
               },
@@ -144,7 +144,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
           },
           {
             icon: GraduationCap,
-            href: '/test',
+            href: '/learnit',
             active: segments.includes('test'),
             label: 'Learn',
           },

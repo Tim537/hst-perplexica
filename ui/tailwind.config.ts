@@ -74,6 +74,9 @@ const config: Config = {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
     function({ addVariant }: { addVariant: (name: string, definition: string) => void }) {
       addVariant('hst', '.hst &');
     },

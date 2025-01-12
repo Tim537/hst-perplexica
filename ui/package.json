@@ -29,6 +29,7 @@
     "markdown-to-jsx": "^7.6.2",
     "next": "^14.2.22",
     "next-themes": "^0.3.0",
+    "perplexica-frontend": "file:",
     "react": "^18",
     "react-dom": "^18",
     "react-text-to-speech": "^0.14.5",
@@ -39,6 +40,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -47,6 +49,7 @@
     "eslint-config-next": "14.1.4",
     "postcss": "^8",
     "prettier": "^3.2.5",
+    "tailwind-scrollbar": "^3.1.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

@@ -1,10 +1,8 @@
 export const editActions = {
   summary: (content: string) => {
-    // TODO: Implement edit functionality for summaries
-    console.log('Editing summary:', content);
+    window.location.href = `/texteditor?content=${encodeURIComponent(content)}`;
   },
   cards: (content: string) => {
-    // TODO: Implement edit functionality for cards
-    console.log('Editing cards:', content);
+    window.location.href = `/cardseditor?content=${encodeURIComponent(content)}`;
   }
 }; 
