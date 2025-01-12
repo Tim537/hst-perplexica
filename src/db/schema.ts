@@ -35,19 +35,19 @@ export const memories = sqliteTable('memories', {
 
 export const cards = sqliteTable('cards', {
   id: integer('id').primaryKey(),
-  stackId: integer('stackId').notNull(),
+  stack: integer('stack').notNull(),
   front: text('front').notNull(),
   back: text('back').notNull(),
 });
 
 export const stacks = sqliteTable('stacks', {
   id: integer('id').primaryKey(),
-  cardIds: text('cardIds', { mode: 'json' }).notNull(),
-  chatId: integer('chatId').notNull(),
+  cards: text('cards', { mode: 'json' }).notNull(),
+  chat: integer('chat').notNull(),
 });
 
 export const summaries = sqliteTable('summaries', {
   id: integer('id').primaryKey(),
   content: text('content').notNull(),
-  chatId: integer('chatId').notNull(),
+  chat: integer('chat').notNull(),
 });
