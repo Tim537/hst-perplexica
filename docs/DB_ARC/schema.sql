@@ -63,7 +63,7 @@ INSERT INTO messages (content, chatId, messageId, role, metadata) VALUES
 
 -- Insert example memories
 INSERT INTO memories (content, type) VALUES
-('Benutzer interessiert sich für Datenbankarchitektur', 'context'),
+('Suche nur schwarz-weiß Bilder aus', 'image'),
 ('Vorherige Diskussion über SQL vs NoSQL', 'conversation');
 
 -- Insert example cards

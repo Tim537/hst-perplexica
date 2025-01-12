@@ -193,7 +193,7 @@ LEFT JOIN summaries s ON c.id = s.chat;
 6. **Alle Erinnerungen eines bestimmten Typs**
 ```sql
 SELECT * FROM memories 
-WHERE type = 'context';
+WHERE type = 'image';
 ```
 
 7. **Anzahl der Nachrichten pro Chat**
