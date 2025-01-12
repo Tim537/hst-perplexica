@@ -23,7 +23,6 @@ interface CardsDialogProps {
   onGenerate?: (cards: CardData[]) => void;
   cardsId?: string;
   isGenerating?: boolean;
-  cards?: CardData[] | null;
 }
 
 /**

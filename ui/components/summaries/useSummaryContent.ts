@@ -3,10 +3,10 @@ import { summaryApi } from '../shared/toolbar/actions/edit';
 
 interface UseSummaryContentProps {
   mode: 'generate' | 'view';
-  summaryId?: string;
+  chatId: string;
 }
 
-export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) => {
+export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
   const [content, setContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,8 +16,8 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
     const loadContent = async () => {
       try {
         setIsLoading(true);
-        if (mode === 'view' && summaryId) {
-          const summary = await summaryApi.load(summaryId);
+        if (mode === 'view' && chatId) {
+          const summary = await summaryApi.load(chatId);
           setContent(summary.content);
           setSummaryData({ id: parseInt(summary.id) });
         } else if (mode === 'generate') {
@@ -34,13 +34,13 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
     };
 
     loadContent();
-  }, [mode, summaryId]);
+  }, [mode, chatId]);
 
   return {
     content,
     setContent,
     isLoading,
     error,
-    summaryData
+    summaryData,
   };
-}; 
+};
