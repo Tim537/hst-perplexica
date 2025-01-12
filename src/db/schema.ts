@@ -43,11 +43,11 @@ export const cards = sqliteTable('cards', {
 export const stacks = sqliteTable('stacks', {
   id: integer('id').primaryKey(),
   cards: text('cards', { mode: 'json' }).notNull(),
-  chat: integer('chat').notNull(),
+  chat: text('chat').notNull(),
 });
 
 export const summaries = sqliteTable('summaries', {
   id: integer('id').primaryKey(),
   content: text('content').notNull(),
-  chat: integer('chat').notNull(),
+  chat: text('chat').notNull(),
 });
