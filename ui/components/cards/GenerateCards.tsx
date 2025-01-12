@@ -12,44 +12,53 @@ interface GenerateCardsProps {
 
 const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const isViewMode = Boolean(existingCards);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [cards, setCards] = useState<CardData[] | null>(existingCards || null);
+  const [isViewMode, setIsViewMode] = useState(Boolean(existingCards));
 
-  const handleGenerate = async (generatedCards: CardData[]) => {
+  const handleGenerate = async () => {
     if (isViewMode) {
       setIsDialogOpen(true);
+      setCards(existingCards ? existingCards : null);
       return;
     }
 
+    setIsGenerating(true);
+    setIsDialogOpen(true);
+    setIsViewMode(true);
+
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/cards/createCards`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cards/createStack`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            chatHistory: history.map((msg) => msg.content).join('\n'),
+            chatHistory: history,
             chatId: history[history.length - 1].chatId,
-            cards: generatedCards,
           }),
         },
       );
-      if (res.status === 200) {
+      if (res.status === 200 || res.status === 201) {
         const data = await res.json();
+        setCards(data.stack.cards);
         toast.success('Cards generated successfully');
       } else {
         toast.error('Failed to generate cards');
       }
+      setIsGenerating(false);
     } catch (error) {
       toast.error('Failed to generate cards');
+      setIsGenerating(false);
     }
   };
 
   return (
     <>
       <button
-        onClick={() => setIsDialogOpen(true)}
+        onClick={() => handleGenerate()}
         className="border border-dashed border-light-200 dark:border-dark-200 hover:bg-light-200 dark:hover:bg-dark-200 active:scale-95 duration-200 transition px-4 py-2 flex flex-row items-center justify-between rounded-lg dark:text-white text-sm w-full"
       >
         <div className="flex flex-row items-center space-x-2">
@@ -66,7 +75,8 @@ const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
         setIsOpen={setIsDialogOpen}
         mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
-        initialCards={existingCards ? existingCards : []}
+        initialCards={cards ? cards : []}
+        isGenerating={isGenerating}
       />
     </>
   );

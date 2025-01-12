@@ -58,6 +58,7 @@ const MessageBox = ({
   const [speechMessage, setSpeechMessage] = useState(message.content);
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
+
   const [cards, setCards] = useState<CardData[] | null | undefined>(null);
   const [summaryId, setSummaryId] = useState<string>('');
   useEffect(() => {
@@ -106,13 +107,16 @@ const MessageBox = ({
     const fetchCards = async () => {
       const chatID = history[history.length - 1].chatId;
       const cards = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/cards/${chatID}/getCards`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cards/${chatID}/listStacksByChatId`,
       );
       if (cards.status === 200) {
         const data = await cards.json();
         setCards(data.cards);
       } else {
-        setCards(null);
+        setCards(undefined);
+      }
+      if (cards === null) {
+        fetchCards();
       }
     };
     if (cards === null) {
