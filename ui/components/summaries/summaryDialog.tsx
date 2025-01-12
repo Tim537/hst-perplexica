@@ -27,7 +27,7 @@ interface SummaryDialogProps {
   /** The mode of operation - either generating a new summary or viewing an existing one */
   mode: 'generate' | 'view';
   /** ID of the summary to view (only required in 'view' mode) */
-  summaryId?: string;
+  summaryId: string;
   /** Callback when a summary is generated (only used in 'generate' mode) */
   onGenerate?: (content: string) => void;
   /** The summary to display */
@@ -67,18 +67,28 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   summary,
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [currentSummaryId, setCurrentSummaryId] = useState<number | null>(null);
 
   // Content management
-  const { content, setContent, isLoading, error } = useSummaryContent({
-    mode,
-    summaryId,
-  });
+  const { content, setContent, isLoading, error, summaryData } =
+    useSummaryContent({
+      mode,
+      summaryId,
+    });
 
   useEffect(() => {
     if (summary) {
       setContent(summary);
     }
   }, [summary, setContent]);
+
+  useEffect(() => {
+    if (summaryData?.id) {
+      setCurrentSummaryId(summaryData.id);
+    } else if (summaryId) {
+      setCurrentSummaryId(parseInt(summaryId));
+    }
+  }, [summaryData, summaryId]);
 
   // Toolbar configuration
   const features = createSummaryDialogFeatures();
@@ -180,11 +190,11 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
       </Transition>
 
       {/* Export Dialog */}
-      {summaryId && (
+      {currentSummaryId && (
         <ExportDialog
           isOpen={isExportOpen}
           setIsOpen={setIsExportOpen}
-          summaryId={parseInt(summaryId)}
+          summaryId={currentSummaryId}
         />
       )}
     </>

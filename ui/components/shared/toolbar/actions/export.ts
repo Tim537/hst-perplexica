@@ -1,7 +1,7 @@
 export const exportActions = {
   summary: async (id: number, format: 'pdf' | 'docx') => {
     try {
-      const response = await fetch(`/api/summaries/${id}/exportSummary?format=${format}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/summaries/${id}/exportSummary?format=${format}`, {
         method: 'GET',
       });
 

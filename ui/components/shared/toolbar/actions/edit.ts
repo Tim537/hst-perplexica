@@ -22,6 +22,7 @@ export const summaryApi = {
   load: async (summaryId: string): Promise<Summary> => {
     const response = await fetch(`/api/summaries/getSummary/${summaryId}`);
     if (!response.ok) {
+      console.log(response);
       throw new Error('Failed to fetch summary');
     }
     return response.json();

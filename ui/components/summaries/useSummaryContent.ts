@@ -10,6 +10,7 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
   const [content, setContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [summaryData, setSummaryData] = useState<{ id: number } | null>(null);
 
   useEffect(() => {
     const loadContent = async () => {
@@ -18,10 +19,14 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
         if (mode === 'view' && summaryId) {
           const summary = await summaryApi.load(summaryId);
           setContent(summary.content);
+          setSummaryData({ id: parseInt(summary.id) });
         } else if (mode === 'generate') {
           setContent(null);
+          setSummaryData(null);
         }
       } catch (err) {
+        console.log('new summary error');
+        console.log(err);
         setError(err instanceof Error ? err.message : 'Failed to load summary');
       } finally {
         setIsLoading(false);
@@ -35,6 +40,7 @@ export const useSummaryContent = ({ mode, summaryId }: UseSummaryContentProps) =
     content,
     setContent,
     isLoading,
-    error
+    error,
+    summaryData
   };
 }; 

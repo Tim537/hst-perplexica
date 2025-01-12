@@ -59,7 +59,7 @@ const MessageBox = ({
   const [isSourcesOpen, setIsSourcesOpen] = useState(false);
   const [summary, setSummary] = useState<string | null | undefined>(null);
   const [cards, setCards] = useState<CardData[] | null | undefined>(null);
-
+  const [summaryId, setSummaryId] = useState<string>('');
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
 
@@ -91,6 +91,7 @@ const MessageBox = ({
       if (summary.status === 200) {
         const data = await summary.json();
         setSummary(data.summary.content);
+        setSummaryId(data.summary.id.toString());
       } else {
         setSummary(undefined);
       }
@@ -254,7 +255,13 @@ const MessageBox = ({
               chatHistory={history.slice(0, messageIndex - 1)}
               query={history[messageIndex - 1].content}
             />
-            <GenerateSummary history={history} existingSummary={summary} />
+            {summaryId.length > 0 && (
+              <GenerateSummary
+                history={history}
+                existingSummary={summary}
+                existingSummaryId={summaryId}
+              />
+            )}
             <GenerateCards history={history} existingCards={cards} />
           </div>
         </div>

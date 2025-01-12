@@ -7,22 +7,26 @@ import SummaryDialog from './summaryDialog';
 interface GenerateSummaryProps {
   history: Message[];
   existingSummary?: string | null;
+  existingSummaryId: string;
 }
 
 const GenerateSummary = ({
   history,
   existingSummary,
+  existingSummaryId,
 }: GenerateSummaryProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [summary, setSummary] = useState<string | null>(
     existingSummary || null,
   );
+  const [summaryId, setSummaryId] = useState<string>(existingSummaryId);
   const isViewMode = Boolean(existingSummary);
 
   const handleGenerate = async () => {
     if (isViewMode) {
       setIsDialogOpen(true);
       setSummary(existingSummary ? existingSummary : null);
+      setSummaryId(existingSummaryId);
       return;
     }
 
@@ -45,6 +49,7 @@ const GenerateSummary = ({
       if (res.status === 200 || res.status === 201) {
         const data = await res.json();
         setSummary(data.summary.content);
+        setSummaryId(data.summary.id.toString());
         toast.success('Summary generated successfully');
       } else {
         toast.error('Failed to generate summary');
@@ -75,6 +80,7 @@ const GenerateSummary = ({
         mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
         summary={summary || undefined}
+        summaryId={summaryId}
       />
     </>
   );

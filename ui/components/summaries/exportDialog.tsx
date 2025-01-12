@@ -1,4 +1,4 @@
-import { X, FileText, FileDown } from 'lucide-react';
+import { BsFiletypeDocx, BsFiletypePdf } from 'react-icons/bs';
 import {
   Dialog,
   DialogPanel,
@@ -6,8 +6,9 @@ import {
   Transition,
   TransitionChild,
 } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { exportActions } from '../shared/toolbar/actions/export';
+import { cn } from '@/lib/utils';
 
 interface ExportDialogProps {
   isOpen: boolean;
@@ -20,9 +21,15 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
   setIsOpen,
   summaryId,
 }) => {
-  const handleExport = async (format: 'pdf' | 'docx') => {
+  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'docx' | null>(
+    null,
+  );
+
+  const handleExport = async () => {
+    if (!selectedFormat) return;
+
     try {
-      await exportActions.summary(summaryId, format);
+      await exportActions.summary(summaryId, selectedFormat);
       setIsOpen(false);
     } catch (error) {
       console.error('Error exporting summary:', error);
@@ -45,7 +52,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/25" />
+          <div className="fixed inset-0 bg-black/25 dark:bg-black/40" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -59,41 +66,69 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-gray-800">
-                <div className="flex items-center justify-between">
-                  <DialogTitle
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
-                  >
-                    Export Summary
-                  </DialogTitle>
-                  <button
-                    type="button"
-                    className="rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => setIsOpen(false)}
-                    aria-label="Close dialog"
-                  >
-                    <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                  </button>
-                </div>
+              <DialogPanel className="w-[23rem] transform overflow-hidden border-[2px] rounded-2xl bg-white hst:rounded-none p-6 text-left align-middle shadow-xl transition-all dark:bg-[#111111] dark:border-[#1c1c1c]">
+                <DialogTitle
+                  as="h3"
+                  className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                >
+                  Export Summary
+                </DialogTitle>
 
-                <div className="mt-4 flex justify-center space-x-4">
+                <div className="mt-4 flex flex-col gap-4">
                   <button
                     type="button"
-                    className="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    onClick={() => handleExport('pdf')}
+                    className={cn(
+                      'flex items-center space-x-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                      selectedFormat === 'pdf'
+                        ? 'bg-[#24a0ed] text-white  hst:bg-hst-accent'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-light-primary/5',
+                      'hst:rounded-none',
+                      'focus:outline-none',
+                    )}
+                    onClick={() => setSelectedFormat('pdf')}
                   >
-                    <FileText className="h-5 w-5" />
+                    <BsFiletypePdf className="h-5 w-5" />
                     <span>PDF</span>
                   </button>
                   <button
                     type="button"
-                    className="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                    onClick={() => handleExport('docx')}
+                    className={cn(
+                      'flex items-center space-x-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
+                      selectedFormat === 'docx'
+                        ? ' bg-[#24a0ed] text-white hst:bg-hst-accent'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-light-primary/5',
+                      'hst:rounded-none',
+                      'focus:outline-none',
+                    )}
+                    onClick={() => setSelectedFormat('docx')}
                   >
-                    <FileDown className="h-5 w-5" />
+                    <BsFiletypeDocx className="h-5 w-5 " />
                     <span>DOCX</span>
                   </button>
+
+                  <div className="mt-6 flex justify-end space-x-3">
+                    <button
+                      type="button"
+                      className="rounded-lg px-4 py-2 text-sm font-medium  bg-[#f3f3ee] border border-[#d0d0d0] dark:text-light-primary dark:bg-[#111111] dark:border-[#1c1c1c]  hst:rounded-none "
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className={cn(
+                        'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+                        'bg-[#24a0ed]	 text-white hover:bg-[#24a0ed90] ',
+                        'hst:bg-hst-accent hst:hover:bg-hst-accent/90 hst:rounded-none',
+                        'focus:outline-none',
+                        'disabled:opacity-50 disabled:cursor-not-allowed',
+                      )}
+                      onClick={handleExport}
+                      disabled={!selectedFormat}
+                    >
+                      Export
+                    </button>
+                  </div>
                 </div>
               </DialogPanel>
             </TransitionChild>
