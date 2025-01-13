@@ -42,7 +42,11 @@ export default function StackComponent({
     }
   };
 
-  const stackFeatures = createStackBarFeatures('/learnit', selectedCards.size);
+  const stackFeatures = createStackBarFeatures(
+    '/learnit',
+    selectedCards.size,
+    selectedCards,
+  );
 
   // Override save action
   if (stackFeatures.save) {

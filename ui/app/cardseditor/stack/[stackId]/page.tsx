@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -14,113 +14,90 @@ import StackComponent from '@/components/cards/Stack';
 import CardEditor from '@/components/cards/CardEditor';
 import { cardsApi } from '@/components/shared/toolbar/actions/edit';
 
-export default function CardsEditorPage() {
-  const searchParams = useSearchParams();
-  const stackId = searchParams.get('id');
-  const content = searchParams.get('content');
+export default function CardsEditorPage({
+  params,
+}: {
+  params: { stackId: string };
+}) {
+  const [stackId, setStackId] = useState<string>(params.stackId);
 
   const [stack, setStack] = useState<Stack | null>(null);
   const [cards, setCards] = useState<Record<string, Card>>({});
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null); // important for the card editor
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Load stack data or initialize from content
-  useEffect(() => {
-    const initializeStack = async () => {
-      try {
-        setIsLoading(true);
-
-        if (stackId) {
-          // Load existing stack
-          const loadedCards = await cardsApi.load(stackId);
-          const cardsMap: Record<string, Card> = {};
-          const cardIds: string[] = [];
-
-          loadedCards.forEach((card) => {
-            cardsMap[card.id] = card;
-            cardIds.push(card.id);
-          });
-
-          setCards(cardsMap);
-          setStack({
-            id: stackId,
-            name: 'Loaded Stack',
-            cardIds: cardIds,
-          });
-        } else if (content) {
-          // Initialize new stack from content
-          try {
-            const initialCards = JSON.parse(content) as Card[];
-            const cardsMap: Record<string, Card> = {};
-            const cardIds: string[] = [];
-
-            initialCards.forEach((card) => {
-              cardsMap[card.id] = card;
-              cardIds.push(card.id);
-            });
-
-            setCards(cardsMap);
-            setStack({
-              id: 'new',
-              name: 'New Stack',
-              cardIds: cardIds,
-            });
-          } catch (parseErr) {
-            console.error('Failed to parse content:', parseErr);
-            setError('Invalid card data');
-          }
-        } else {
-          // New empty stack
-          setStack({
-            id: 'new',
-            name: 'New Stack',
-            cardIds: [],
-          });
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load stack');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeStack();
-  }, [stackId, content]);
-
-  const handleSave = async () => {
-    if (!stack) return;
-
+  // Save content to backend
+  const saveContent = async (
+    cardId: string,
+    field: 'front' | 'back',
+    content: string,
+  ) => {
     try {
-      const cardsList = stack.cardIds.map((id) => cards[id]);
-      const savedCardSet = await cardsApi.save(stack.name, cardsList);
+      const card = cards[cardId];
+      const updatedCard = {
+        ...card,
+        [field]: content,
+      };
 
-      // Update local state with saved data
+      const response = await fetch(
+        `http://localhost:3001/api/cards/${cardId}/updateCard`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            front: updatedCard.front,
+            back: updatedCard.back,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        console.error('Failed to save changes');
+        return;
+      }
+
+      // Update local state
+      setCards((prev) => ({
+        ...prev,
+        [cardId]: updatedCard,
+      }));
+    } catch (error) {
+      console.error('Error saving changes:', error);
+    }
+  };
+
+  // fetch stack data
+  useEffect(() => {
+    const fetchStack = async () => {
+      const stack = await cardsApi.load(stackId);
+
+      console.log('stack');
+      console.log(stack);
+
       const cardsMap: Record<string, Card> = {};
       const cardIds: string[] = [];
 
-      savedCardSet.cards.forEach((card) => {
+      stack.forEach((card) => {
         cardsMap[card.id] = card;
         cardIds.push(card.id);
       });
 
       setCards(cardsMap);
-      setStack((prev) =>
-        prev
-          ? {
-              ...prev,
-              id: savedCardSet.id,
-              name: savedCardSet.title,
-              cardIds,
-            }
-          : null,
-      );
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save stack');
-    }
-  };
+      setStack({
+        id: stackId,
+        name: 'Loaded Stack',
+        cardIds: cardIds,
+      });
+      setIsLoading(false);
+    };
+    fetchStack();
+  }, [stackId]);
 
   const frontEditor = useEditor({
     extensions: [
@@ -134,6 +111,20 @@ export default function CardsEditorPage() {
     ],
     content: selectedCard?.front || '',
     editable: true,
+    onUpdate: ({ editor }) => {
+      if (!selectedCard) return;
+      const content = editor.getHTML();
+
+      // Clear any existing timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Set new timeout to save after 1 second of no typing
+      saveTimeoutRef.current = setTimeout(() => {
+        saveContent(selectedCard.id, 'front', content);
+      }, 1000);
+    },
   }) as EditorWithExtensions;
 
   const backEditor = useEditor({
@@ -148,7 +139,30 @@ export default function CardsEditorPage() {
     ],
     content: selectedCard?.back || '',
     editable: true,
+    onUpdate: ({ editor }) => {
+      if (!selectedCard) return;
+      const content = editor.getHTML();
+
+      // Clear any existing timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Set new timeout to save after 1 second of no typing
+      saveTimeoutRef.current = setTimeout(() => {
+        saveContent(selectedCard.id, 'back', content);
+      }, 1000);
+    },
   }) as EditorWithExtensions;
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const [selectedField, setSelectedField] = useState<'front' | 'back'>('front');
 

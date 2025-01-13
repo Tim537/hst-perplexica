@@ -68,7 +68,9 @@ export const summaryApi = {
 // API actions for cards
 export const cardsApi = {
   load: async (stackId: string): Promise<Card[]> => {
-    const response = await fetch(`/api/cards/getStack/${stackId}`);
+    const response = await fetch(
+      `http://localhost:3001/api/cards/${stackId}/getStackById`,
+    );
     if (!response.ok) {
       throw new Error('Failed to fetch cards');
     }

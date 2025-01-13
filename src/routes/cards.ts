@@ -475,4 +475,51 @@ router.get('/exportCards', async (req, res) => {
   }
 });
 
+/**
+ * Retrieves a stack by stack ID.
+ * @route GET /:stackId/getStackById
+ * @param {string} req.params.stackId - The stack ID to retrieve
+ * @returns {Object} The stack and its associated cards
+ * @throws {400} If stackId is invalid
+ * @throws {404} If stack is not found
+ * @throws {500} If there's a server error
+ */
+router.get('/:stackId/getStackById', async (req, res) => {
+  try {
+    const { stackId } = req.params;
+
+    const numericStackId = parseInt(stackId, 10);
+    if (isNaN(numericStackId)) {
+      return res.status(400).json({ message: 'stackId must be a number' });
+    }
+
+    // Find the stack by its ID
+    const stack = await db
+      .select()
+      .from(stacks)
+      .where(eq(stacks.id, numericStackId))
+      .execute()
+      .then((result) => result[0]);
+
+    if (!stack) {
+      return res.status(404).json({ message: 'Stack not found' });
+    }
+
+    // Fetch all cards associated with the stack
+    const cardIds: number[] = stack.cards as number[];
+    const cardsList = await db
+      .select()
+      .from(cards)
+      .where(inArray(cards.id, cardIds))
+      .execute();
+
+    stack.cards = cardsList;
+
+    return res.status(200).json(stack);
+  } catch (err) {
+    res.status(500).json({ message: 'An error has occurred.' });
+    logger.error(`Error retrieving stack: ${err.message}`);
+  }
+});
+
 export default router;

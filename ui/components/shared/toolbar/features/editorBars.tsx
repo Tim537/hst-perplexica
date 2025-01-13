@@ -238,6 +238,7 @@ export const createCardsEditorFeatures = (
 export const createStackBarFeatures = (
   backUrl: string = '/learnit',
   selectedCardsCount: number = 0,
+  selectedCards: Set<string> = new Set(),
 ): EditorFeatures => ({
   back: {
     icon: ArrowLeft,
@@ -260,6 +261,10 @@ export const createStackBarFeatures = (
     tooltip: 'Export as file',
     action: () => {
       console.log('Export clicked');
+      console.log(selectedCards);
+      const cardIds = Array.from(selectedCards).join(',');
+      const exportUrl = `http://localhost:3001/api/cards/exportCards?cardIds=${cardIds}`;
+      window.location.href = exportUrl;
     },
   },
   ...(selectedCardsCount > 0
@@ -270,8 +275,22 @@ export const createStackBarFeatures = (
           tooltip: `Delete ${selectedCardsCount} selected card${
             selectedCardsCount === 1 ? '' : 's'
           }`,
-          action: () => {
+          action: async () => {
             console.log('Delete clicked');
+            const deletePromises = Array.from(selectedCards).map((cardId) =>
+              fetch(`http://localhost:3001/api/cards/${cardId}/deleteCard`, {
+                method: 'DELETE',
+              }).catch((error) => {
+                console.error(`Error deleting card with id ${cardId}:`, error);
+              }),
+            );
+
+            try {
+              await Promise.all(deletePromises);
+              window.location.reload();
+            } catch (error) {
+              console.error('Error deleting cards:', error);
+            }
           },
           className:
             'text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500 hover:cursor-pointer',
