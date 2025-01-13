@@ -7,20 +7,29 @@ import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { ChatOpenAI } from '@langchain/openai';
 
 const cardGeneratorPrompt = `
-You are an AI flashcard generator for an AI powered search engine. You will be given a conversation below. You need to generate 3-10 flashcards based on the conversation. The flashcards should be relevant to the conversation and can be used to learn the contents from the chat.
+You are an AI flashcard generator for an AI powered search engine. You will be given a conversation below. You need to generate at least 1 but as many flashcards are possible based on the conversation. The flashcards should be relevant to the conversation and can be used to learn the contents from the chat.
 You need to make sure the cards are relevant to the conversation and are helpful to the user.
 Make sure the cards are not too long and are informative and relevant to the conversation.
 
-Provide these cards separated by newlines between the XML tags <card> and </card>. Also differentiate between the front <front> and </front>and back <back> and </back> of the card with a newline. For example:
+Provide these cards separated by newlines between the XML tags <cards> and </cards>. Also differentiate between the front <front> and </front>and back <back> and </back> of the card with a newline. For example:
 
-<card>
+<cards>
+
 <front>
 What is the capital of France?
 </front>
 <back>
 Paris
 </back>
-</card>
+
+<front>
+How many people live in Germany?
+</front>
+<back>
+83 million
+</back>
+
+</cards>
 
 Conversation:
 {chat_history}
@@ -31,7 +40,7 @@ type CardGeneratorInput = {
 };
 
 const outputParser = new ListLineOutputParser({
-  key: 'card',
+  key: 'cards',
 });
 
 const createSuggestionGeneratorChain = (llm: BaseChatModel) => {

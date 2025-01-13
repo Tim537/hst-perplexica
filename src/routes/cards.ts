@@ -137,6 +137,8 @@ router.post('/createStack', async (req, res) => {
       llm,
     );
 
+    console.log(generatedCards);
+
     const parsedCards = parseCardsFromArray(generatedCards);
 
     const cardIds = [];
@@ -187,6 +189,7 @@ router.post('/createStack', async (req, res) => {
       .status(201)
       .json({ message: 'Stack created successfully', stack: newStack });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: 'An error has occurred.' });
     logger.error(`Error creating stack: ${err.message}`);
   }
