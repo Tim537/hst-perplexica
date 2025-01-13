@@ -50,7 +50,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
   setIsOpen,
   mode,
   initialCards = [],
-  onGenerate,
   cardsId,
   isGenerating,
 }) => {
@@ -66,7 +65,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
     direction,
     isAnimating,
     reinitialize,
-    isLoading,
     error,
   } = useCards({ mode, cardsId, initialCards });
 
@@ -98,10 +96,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
   // Override edit action
   if (features.edit) {
     features.edit.action = handleEdit;
-  }
-
-  if (isLoading) {
-    return <div>Loading cards...</div>;
   }
 
   if (error) {

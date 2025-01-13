@@ -137,7 +137,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                 <DialogPanel className="w-full max-w-[47.938rem] transform flex flex-col justify-between rounded-[1.25rem] hst:rounded-none bg-light-primary dark:bg-dark-primary border border-[#E7E7E7] dark:border-dark-200 p-6 text-left align-middle shadow-[0_0.25rem_0.25rem_rgba(0,0,0,0.25)] transition-all">
                   {/* Dialog header */}
                   <div className="flex justify-between items-center">
-                    <DialogTitle className="text-xl font-medium text-black dark:text-white hst:text-white">
+                    <DialogTitle className="text-xl font-medium text-black dark:text-white">
                       {mode === 'generate'
                         ? 'Generate Summary'
                         : 'View Summary'}
@@ -145,7 +145,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                     <Tooltip text="Close" spacing="0.5rem">
                       <button
                         onClick={() => setIsOpen(false)}
-                        className="text-[#757573] hover:text-[#454545] dark:hover:text-white hst:text-white/70 hst:hover:text-white/40 transition-colors"
+                        className="text-[#757573] hover:text-[#454545] dark:hover:text-white  transition-colors"
                         aria-label="Close dialog"
                       >
                         <X className="w-6 h-6" />

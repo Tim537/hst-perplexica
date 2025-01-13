@@ -13,7 +13,6 @@ export const useCards = ({ mode, cardsId, initialCards = [] }: UseCardsProps) =>
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<'left' | 'right'>('right');
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const currentCard = cards[currentIndex];
@@ -51,7 +50,6 @@ export const useCards = ({ mode, cardsId, initialCards = [] }: UseCardsProps) =>
   useEffect(() => {
     const loadCards = async () => {
       try {
-        setIsLoading(true);
         if (mode === 'view' && cardsId) {
           const loadedCards = await cardsApi.load(cardsId);
           setCards(loadedCards);
@@ -60,8 +58,6 @@ export const useCards = ({ mode, cardsId, initialCards = [] }: UseCardsProps) =>
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load cards');
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -80,7 +76,6 @@ export const useCards = ({ mode, cardsId, initialCards = [] }: UseCardsProps) =>
     direction,
     isAnimating,
     reinitialize,
-    isLoading,
     error
   };
 }; 
