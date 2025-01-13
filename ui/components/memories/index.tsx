@@ -203,10 +203,6 @@ const Memories: React.FC<MemoriesProps> = ({ isOpen = false, setIsOpen }) => {
     );
   };
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
