@@ -61,6 +61,8 @@ const MessageBox = ({
 
   const [cards, setCards] = useState<CardData[] | null>(null);
   const [summaryId, setSummaryId] = useState<string>('');
+  const [stackId, setStackId] = useState<number>(0);
+
   useEffect(() => {
     const regex = /\[(\d+)\]/g;
 
@@ -112,6 +114,7 @@ const MessageBox = ({
       if (cards.status === 200) {
         const data = await cards.json();
         setCards(data.cards);
+        setStackId(data.id);
       } else {
         setCards([]);
       }
@@ -261,7 +264,11 @@ const MessageBox = ({
               existingSummary={summary}
               existingSummaryId={summaryId}
             />
-            <GenerateCards history={history} existingCards={cards || []} />
+            <GenerateCards
+              history={history}
+              existingCards={cards || []}
+              stackId={stackId}
+            />
           </div>
         </div>
       )}

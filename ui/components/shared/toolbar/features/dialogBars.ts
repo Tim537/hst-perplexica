@@ -31,11 +31,11 @@ export const createSummaryDialogFeatures = (summaryId: number) => ({
  * Creates a feature configuration for the cards dialog toolbar
  * @returns A configuration object containing all available features for the cards dialog
  */
-export const createCardsDialogFeatures = () => ({
+export const createCardsDialogFeatures = (stackId: number) => ({
   edit: {
     icon: Pencil,
     label: 'Edit',
-    action: editActions.cards,
+    action: () => editActions.cards(stackId),
     tooltip: 'Edit cards',
   },
   export: {

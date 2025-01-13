@@ -90,7 +90,7 @@ export const editActions = {
   summary: (summaryId: number) => {
     window.location.href = `/texteditor/summary/${summaryId}`;
   },
-  cards: (content: string) => {
-    window.location.href = `/cardseditor?content=${encodeURIComponent(content)}`;
+  cards: (stackId: number) => {
+    window.location.href = `/cardseditor/stack/${stackId}`;
   },
 };

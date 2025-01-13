@@ -9,9 +9,14 @@ import { useEffect } from 'react';
 interface GenerateCardsProps {
   history: Message[];
   existingCards: CardData[];
+  stackId: number;
 }
 
-const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
+const GenerateCards = ({
+  history,
+  existingCards,
+  stackId,
+}: GenerateCardsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [cards, setCards] = useState<CardData[]>([]);
@@ -83,6 +88,7 @@ const GenerateCards = ({ history, existingCards }: GenerateCardsProps) => {
         onGenerate={handleGenerate}
         initialCards={cards ? cards : []}
         isGenerating={isGenerating}
+        stackId={stackId}
       />
     </>
   );
