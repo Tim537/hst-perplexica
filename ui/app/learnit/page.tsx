@@ -99,8 +99,23 @@ export default function LearnitPage() {
   const handleDeleteStack = async (stackId: string) => {
     await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/cards/${stackId}/deleteStack`,
+      {
+        method: 'DELETE',
+      },
     );
+    setStacks(stacks.filter((s) => s.id !== stackId));
   };
+
+  const handleDeleteSummary = async (summaryId: string) => {
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/summaries/${summaryId}/deleteSummary`,
+      {
+        method: 'DELETE',
+      },
+    );
+    setSummaries(summaries.filter((s) => s.id !== summaryId));
+  };
+
   return (
     <div className="p-8">
       {/* Filter Bar */}
@@ -160,20 +175,16 @@ export default function LearnitPage() {
                       {(summary.chatTitle || 'Untitled').slice(0, 25)}
                       {(summary.chatTitle?.length || 0) > 25 ? '...' : ''}
                     </h3>
-                    <div className="flex gap-2">
-                      <button
-                        className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Edit Summary Title`}
-                      >
-                        <Pencil className="w-4 h-4 text-[#24A0ED]" />
-                      </button>
-                      <button
-                        className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Delete Summary Title`}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
+                    <button
+                      className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
+                      aria-label={`Delete Stack Title`}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        handleDeleteSummary(summary.id);
+                      }}
+                    >
+                      <Trash2 className="w-4 h-5 text-red-500" />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -208,8 +219,7 @@ export default function LearnitPage() {
                       aria-label={`Delete Stack Title`}
                       onClick={async (e) => {
                         e.stopPropagation();
-                        await handleDeleteStack(stack.id);
-                        setStacks(stacks.filter((s) => s.id !== stack.id));
+                        handleDeleteStack(stack.id);
                       }}
                     >
                       <Trash2 className="w-4 h-5 text-red-500" />
@@ -229,6 +239,7 @@ export default function LearnitPage() {
         setIsOpen={setIsCardsDialogOpen}
         mode="view"
         cardsId={selectedStack?.id || ''}
+        stackId={Number(selectedStack?.id) || 0}
       />
       <SummaryDialog
         isOpen={isSummaryDialogOpen}
