@@ -8,14 +8,12 @@ interface UseSummaryContentProps {
 
 export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
   const [content, setContent] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [summaryData, setSummaryData] = useState<{ id: number } | null>(null);
 
   useEffect(() => {
     const loadContent = async () => {
       try {
-        setIsLoading(true);
         if (mode === 'view' && chatId) {
           const summary = await summaryApi.load(chatId);
           setContent(summary.content);
@@ -28,8 +26,6 @@ export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
         console.log('new summary error');
         console.log(err);
         setError(err instanceof Error ? err.message : 'Failed to load summary');
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -39,7 +35,6 @@ export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
   return {
     content,
     setContent,
-    isLoading,
     error,
     summaryData,
   };

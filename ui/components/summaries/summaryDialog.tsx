@@ -12,7 +12,6 @@ import TextContentLoader from '../shared/loadings/TextContentLoader';
 import Toolbar from '../shared/toolbar/Toolbar';
 import { createSummaryDialogFeatures } from '../shared/toolbar/features/dialogBars';
 import { useSummaryContent } from './useSummaryContent';
-import { editActions, summaryApi } from '../shared/toolbar/actions/edit';
 import ExportDialog from './exportDialog';
 
 /**
@@ -75,11 +74,10 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
   const [currentSummaryId, setCurrentSummaryId] = useState<number | null>(null);
 
   // Content management
-  const { content, setContent, isLoading, error, summaryData } =
-    useSummaryContent({
-      mode,
-      chatId,
-    });
+  const { content, setContent, error, summaryData } = useSummaryContent({
+    mode,
+    chatId,
+  });
 
   useEffect(() => {
     if (summary) {
@@ -158,17 +156,15 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                   {/* Summary text area */}
                   <div className="mt-6 flex-grow">
                     <div className="w-full h-[23.948rem] rounded-[0.625rem] hst:rounded-none border-2 border-[#CCCCCC] dark:border-dark-200 p-4 overflow-y-auto">
-                      {isLoading ? (
+                      {error ? (
+                        <div className="text-red-500">{error}</div>
+                      ) : isGenerating ? (
                         <TextContentLoader
                           lines={3}
                           lineWidths={['100%', '75%', '85%']}
                           fullWidth
                           className="bg-transparent"
                         />
-                      ) : error ? (
-                        <div className="text-red-500">{error}</div>
-                      ) : isGenerating ? (
-                        <div>Generating...</div>
                       ) : (
                         <div>{content}</div>
                       )}
