@@ -23,6 +23,7 @@ interface CardsDialogProps {
   onGenerate?: (cards: CardData[]) => void;
   cardsId?: string;
   isGenerating?: boolean;
+  stackId: number;
 }
 
 /**
@@ -52,6 +53,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
   initialCards = [],
   cardsId,
   isGenerating,
+  stackId,
 }) => {
   const {
     cards,
@@ -91,12 +93,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
   };
 
   // Toolbar configuration
-  const features = createCardsDialogFeatures();
-
-  // Override edit action
-  if (features.edit) {
-    features.edit.action = handleEdit;
-  }
+  const features = createCardsDialogFeatures(stackId);
 
   if (error) {
     return <div className="text-red-500">{error}</div>;
