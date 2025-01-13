@@ -43,6 +43,24 @@ router.get('/:id', async (req, res) => {
     logger.error(`Error in getting chat: ${err.message}`);
   }
 });
+// get chat title by id
+router.get('/title/:id', async (req, res) => {
+  try {
+    const chat = await db.query.chats.findFirst({
+      where: eq(chats.id, req.params.id),
+      columns: { title: true }  // Only select the title field
+    });
+
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+
+    return res.status(200).json({ title: chat.title });
+  } catch (err) {
+    res.status(500).json({ message: 'An error has occurred.' });
+    logger.error(`Error getting chat title: ${err.message}`);
+  }
+});
 
 // delete a chat by id and its messages
 router.delete(`/:id`, async (req, res) => {

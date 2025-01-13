@@ -2,128 +2,105 @@
 
 import { useEffect, useState } from 'react';
 import { Pencil, FileText, Layers, Trash2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import SummaryDialog from '@/components/summaries/summaryDialog';
 import CardsDialog from '@/components/cards/cardsDialog';
 import { Card } from '@/components/cards/types';
 import { cn } from '@/lib/utils';
-import {
-  editActions,
-  summaryApi,
-  cardsApi,
-} from '@/components/shared/toolbar/actions/edit';
 
+type FilterType = 'all' | 'summaries' | 'flashcards';
 interface Summary {
   id: string;
-  title: string;
   content: string;
+  chatTitle: string;
+  chat: string;
 }
 
 interface Stack {
   id: string;
   title: string;
+  chat: string;
   cards: Card[];
 }
 
-type FilterType = 'all' | 'summaries' | 'flashcards';
-
 export default function LearnitPage() {
-  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
-  const [selectedStack, setSelectedStack] = useState<string | null>(null);
-  const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
-  const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false);
-
-  const [summaries, setSummaries] = useState<Summary[]>([]);
-  const [stacks, setStacks] = useState<Stack[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Load data
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true);
-        // In reality, these would be separate API endpoints
-        // For now, we'll use our existing endpoints
-        const [loadedSummaries, loadedStacks] = await Promise.all([
-          summaryApi.loadAll(), // This needs to be added to the API
-          cardsApi.loadAll(), // This needs to be added to the API
-        ]);
-
-        setSummaries(loadedSummaries);
-        setStacks(loadedStacks);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
-
   const showSummaries = activeFilter === 'all' || activeFilter === 'summaries';
   const showStacks = activeFilter === 'all' || activeFilter === 'flashcards';
 
-  const handleEditSummary = (summaryId: string) => {
-    const summary = summaries.find((s) => s.id === summaryId);
-    if (summary) {
-      editActions.summary('test');
-    }
-  };
+  const [summaries, setSummaries] = useState<Summary[]>([]);
+  const [stacks, setStacks] = useState<Stack[]>([]);
 
-  const handleEditStack = (stackId: string) => {
-    router.push(`/cardseditor?id=${stackId}`);
-  };
+  const [selectedSummary, setSelectedSummary] = useState<Summary | null>(null);
+  const [selectedStack, setSelectedStack] = useState<Stack | null>(null);
 
-  const handleDeleteSummary = async (summaryId: string) => {
-    try {
-      await summaryApi.delete(summaryId); // This needs to be added to the API
-      setSummaries((prev) => prev.filter((s) => s.id !== summaryId));
-    } catch (err) {
-      console.error('Failed to delete summary:', err);
-    }
-  };
+  const [isCardsDialogOpen, setIsCardsDialogOpen] = useState(false);
+  const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchSummaries = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/summaries/listSummaries`,
+        );
+        if (!response.ok) throw new Error('Failed to fsetch summaries');
+        const data = await response.json();
+
+        // Fetch the chat titles
+        const summariesWithTitles = await Promise.all(
+          data.summaries.map(async (summary: any) => {
+            const titleResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/chats/title/${summary.chat}`,
+            );
+            const { title } = await titleResponse.json();
+            return {
+              ...summary,
+              chatTitle: title,
+            };
+          }),
+        );
+
+        setSummaries(summariesWithTitles);
+      } catch (error) {
+        console.error('Error fetching summaries:', error);
+      }
+    };
+
+    fetchSummaries();
+  }, []);
+
+  useEffect(() => {
+    const fetchStacks = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/cards/listAllStacks`,
+        );
+        if (!response.ok) throw new Error('Failed to fetch stacks');
+        const data = await response.json();
+
+        // Fetch the chat titles
+        const stacksWithTitles = await Promise.all(
+          data.map(async (stack: any) => {
+            const titleResponse = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/chats/title/${stack.chat}`,
+            );
+            const { title } = await titleResponse.json();
+            return { ...stack, chatTitle: title };
+          }),
+        );
+
+        setStacks(stacksWithTitles);
+      } catch (error) {
+        console.error('Error fetching stacks:', error);
+      }
+    };
+    fetchStacks();
+  }, []);
 
   const handleDeleteStack = async (stackId: string) => {
-    try {
-      await cardsApi.delete(stackId); // This needs to be added to the API
-      setStacks((prev) => prev.filter((s) => s.id !== stackId));
-    } catch (err) {
-      console.error('Failed to delete stack:', err);
-    }
-  };
-
-  const handleCardsDialogClose = (open: boolean) => {
-    setIsCardsDialogOpen(open);
-    if (!open) {
-      setSelectedStack(null);
-    }
-  };
-
-  // Get the cards for the selected stack
-  const selectedStackCards = selectedStack
-    ? stacks.find((s) => s.id === selectedStack)?.cards || []
-    : [];
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
+    await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/cards/${stackId}/deleteStack`,
     );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        {error}
-      </div>
-    );
-  }
-
+  };
   return (
     <div className="p-8">
       {/* Filter Bar */}
@@ -169,35 +146,30 @@ export default function LearnitPage() {
               <h2 className="text-xl font-semibold mb-4">Summaries</h2>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {summaries.map((summary) => (
+              {summaries.map((summary: Summary) => (
                 <div
                   key={summary.id}
                   className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
                   onClick={() => {
-                    setSelectedSummary(summary.id);
                     setIsSummaryDialogOpen(true);
+                    setSelectedSummary(summary);
                   }}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{summary.title}</h3>
+                    <h3 className="font-medium">
+                      {(summary.chatTitle || 'Untitled').slice(0, 25)}
+                      {(summary.chatTitle?.length || 0) > 25 ? '...' : ''}
+                    </h3>
                     <div className="flex gap-2">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditSummary(summary.id);
-                        }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Edit ${summary.title}`}
+                        aria-label={`Edit Summary Title`}
                       >
                         <Pencil className="w-4 h-4 text-[#24A0ED]" />
                       </button>
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteSummary(summary.id);
-                        }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Delete ${summary.title}`}
+                        aria-label={`Delete Summary Title`}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
@@ -216,42 +188,35 @@ export default function LearnitPage() {
               <h2 className="text-xl font-semibold mb-4">Flashcard Stacks</h2>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {stacks.map((stack) => (
+              {stacks.map((stack: any) => (
                 <div
                   key={stack.id}
                   className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
                   onClick={() => {
-                    setSelectedStack(stack.id);
+                    setSelectedStack(stack);
                     setIsCardsDialogOpen(true);
                   }}
                 >
                   <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{stack.title}</h3>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEditStack(stack.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Edit ${stack.title}`}
-                      >
-                        <Pencil className="w-4 h-4 text-[#24A0ED]" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteStack(stack.id);
-                        }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                        aria-label={`Delete ${stack.title}`}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
+                    <h3 className="font-medium">
+                      {(stack.chatTitle || 'Untitled').slice(0, 25)}
+                      {(stack.chatTitle?.length || 0) > 25 ? '...' : ''}
+                    </h3>
+
+                    <button
+                      className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
+                      aria-label={`Delete Stack Title`}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        await handleDeleteStack(stack.id);
+                        setStacks(stacks.filter((s) => s.id !== stack.id));
+                      }}
+                    >
+                      <Trash2 className="w-4 h-5 text-red-500" />
+                    </button>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">
-                    {stack.cards.length} cards
+                    {stack.cards.length}
                   </p>
                 </div>
               ))}
@@ -259,20 +224,19 @@ export default function LearnitPage() {
           </div>
         )}
       </div>
-
-      {/* Dialogs */}
+      <CardsDialog
+        isOpen={isCardsDialogOpen}
+        setIsOpen={setIsCardsDialogOpen}
+        mode="view"
+        cardsId={selectedStack?.id || ''}
+      />
       <SummaryDialog
         isOpen={isSummaryDialogOpen}
         setIsOpen={setIsSummaryDialogOpen}
         mode="view"
-        summaryId={selectedSummary || undefined}
-      />
-
-      <CardsDialog
-        isOpen={isCardsDialogOpen}
-        setIsOpen={handleCardsDialogClose}
-        mode="view"
-        initialCards={selectedStackCards}
+        summary={selectedSummary?.content || ''}
+        summaryId={selectedSummary?.id || ''}
+        chatId={selectedSummary?.chat || ''}
       />
     </div>
   );

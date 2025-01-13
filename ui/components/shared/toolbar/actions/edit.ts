@@ -38,22 +38,7 @@ export const summaryApi = {
     return response.json();
   },
 
-  save: async (chatId: string, chatHistory: string): Promise<Summary> => {
-    const response = await fetch('/api/summaries/createSummary', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ chatId, chatHistory }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to save summary');
-    }
-
-    return response.json();
-  },
-
+  
   delete: async (summaryId: string): Promise<void> => {
     const response = await fetch(`/api/summaries/deleteSummary/${summaryId}`, {
       method: 'DELETE',
@@ -79,28 +64,15 @@ export const cardsApi = {
   },
 
   loadAll: async (): Promise<Stack[]> => {
-    const response = await fetch('/api/cards/getAllStacks');
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/cards/getAllStacks`,
+    );
     if (!response.ok) {
       throw new Error('Failed to fetch stacks');
     }
     return response.json();
   },
 
-  save: async (chatId: string, chatHistory: string): Promise<CardSet> => {
-    const response = await fetch('/api/cards/createStack', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ chatId, chatHistory }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to save cards');
-    }
-
-    return response.json();
-  },
 
   delete: async (stackId: string): Promise<void> => {
     const response = await fetch(`/api/cards/deleteStack/${stackId}`, {
