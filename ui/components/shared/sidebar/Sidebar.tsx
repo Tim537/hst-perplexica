@@ -16,6 +16,7 @@ import React, { useState, type ReactNode } from 'react';
 import Layout from '../layout/Layout';
 import SettingsDialog from '../../settings';
 import Memories from '@/components/memories';
+import SideBarToolTip from './SideBarToolTip';
 
 const VerticalIconContainer = ({ children }: { children: ReactNode }) => {
   return (
@@ -32,7 +33,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-20 lg:flex-col">
-        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto hst:bg-hst-accent hst:text-white bg-light-secondary dark:bg-dark-secondary hst:bg-green px-2 py-8">
+        <div className="flex grow flex-col items-center justify-between gap-y-5 overflow-y-auto hst:bg-hst-accent hst:text-white bg-light-secondary dark:bg-dark-secondary px-2 py-8">
           <div className="flex flex-col gap-y-3 w-full">
             <a
               href="/"
@@ -43,8 +44,12 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                   : 'text-black/85 dark:text-white/85 hst:text-white/85',
               )}
             >
-              <SquarePen className="hover:scale-110 transition duration-150" />
+              <SideBarToolTip text="New Chat">
+                <SquarePen className="hover:scale-110 transition duration-150" />
+              </SideBarToolTip>
             </a>
+
+            <div className="" />
             <a
               href="/library"
               className={cn(
@@ -54,7 +59,9 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                   : 'text-black/85 dark:text-white/85 hst:text-white/85',
               )}
             >
-              <History className="hover:scale-110 transition duration-150" />
+              <SideBarToolTip text="History">
+                <History className="hover:scale-110 transition duration-150" />
+              </SideBarToolTip>
             </a>
           </div>
 
@@ -69,7 +76,7 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
               {
                 icon: GraduationCap,
                 href: '/learnit',
-                active: segments.includes('test'),
+                active: segments.includes('learnit'),
                 label: 'Learn',
               },
               {
@@ -89,42 +96,34 @@ const Sidebar = ({ children }: { children: React.ReactNode }) => {
                     : 'text-black/85 dark:text-white/85 hst:text-white/85',
                 )}
               >
-                <link.icon className="hover:scale-110 transition duration-150" />
+                <SideBarToolTip text={link.label}>
+                  <link.icon className="hover:scale-110 transition duration-150" />
+                </SideBarToolTip>
                 {link.active && (
                   <div>
-                    <div className="absolute right-0 -mr-2 h-full w-1 top-0 rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:left-[4rem]" />
-                    <div className="absolute right-0 -mr-2 h-full w-1 hidden hst:block rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:right-[4.4rem]" />
+                    <div className="absolute right-0 -mr-2 h-full w-1 top-0 rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.7rem] hst:left-[4rem]" />
+                    <div className="absolute right-0 -mr-2 h-full w-1 hidden hst:block rounded-l-lg bg-black dark:bg-white hst:bg-white hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.7rem] hst:right-[4.4rem]" />
                   </div>
                 )}
-                <div
-                  className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white 
-                  hst:bg-hst-primary hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:left-[4rem]
-                  opacity-0 translate-x-[16px] hst:group-hover:translate-x-0 hst:group-hover:opacity-100 
-                  transition-all duration-200 ease-out
-                  hidden hst:block"
-                />
-                <div
-                  className="absolute right-0 -mr-2 h-full w-1 rounded-l-lg bg-black dark:bg-white 
-                  hst:bg-hst-primary hst:rounded-none hst:w-[20px] hst:h-[20px] hst:rotate-[135deg] hst:top-[0.61rem] hst:right-[4.4rem]
-                  opacity-0 translate-x-[-16px] hst:group-hover:translate-x-0 hst:group-hover:opacity-100 
-                  transition-all duration-200 ease-out
-                  hidden hst:block"
-                />
               </a>
             ))}
           </VerticalIconContainer>
 
           <div className="flex flex-col gap-y-8">
-            <BrainCircuit
-              onClick={() => setIsMemoriesOpen(!isMemoriesOpen)}
-              className="cursor-pointer hover:scale-110 transition duration-150 text-black/85 dark:text-white/85 hst:text-white/85 hover:text-black dark:hover:text-white hst:hover:text-white"
-            />
+            <SideBarToolTip text="Memories">
+              <BrainCircuit
+                onClick={() => setIsMemoriesOpen(!isMemoriesOpen)}
+                className="cursor-pointer hover:scale-110 transition duration-150 text-black/85 dark:text-white/85 hst:text-white/85 hover:text-black dark:hover:text-white hst:hover:text-white"
+              />
+            </SideBarToolTip>
             <Memories isOpen={isMemoriesOpen} setIsOpen={setIsMemoriesOpen} />
 
-            <Settings
-              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-              className="cursor-pointer hover:scale-110 hover:rotate-90 transition duration-150 text-black/85 dark:text-white/85 hst:text-white/85 hover:text-black dark:hover:text-white hst:hover:text-white"
-            />
+            <SideBarToolTip text="Settings">
+              <Settings
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                className="cursor-pointer hover:scale-110 hover:rotate-90 transition duration-150 text-black/85 dark:text-white/85 hst:text-white/85 hover:text-black dark:hover:text-white hst:hover:text-white"
+              />
+            </SideBarToolTip>
 
             <SettingsDialog
               isOpen={isSettingsOpen}

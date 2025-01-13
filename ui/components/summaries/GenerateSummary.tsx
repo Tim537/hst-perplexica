@@ -82,7 +82,7 @@ const GenerateSummary = ({
     <>
       <button
         onClick={() => handleGenerate()}
-        className="border border-dashed border-light-200 dark:border-dark-200 hover:bg-light-200 dark:hover:bg-dark-200 active:scale-95 duration-200 transition px-4 py-2 flex flex-row items-center justify-between rounded-lg dark:text-white text-sm w-full"
+        className="border border-dashed border-light-200 dark:border-dark-200 hover:bg-light-200 dark:hover:bg-dark-200 active:scale-95 duration-200 transition px-4 py-2 flex flex-row items-center justify-between rounded-lg hst:rounded-none dark:text-white text-sm w-full"
       >
         <div className="flex flex-row items-center space-x-2">
           {isViewMode ? <Eye size={17} /> : <FileText size={17} />}

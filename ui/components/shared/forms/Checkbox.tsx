@@ -24,7 +24,7 @@ export default function Checkbox({
       <input
         type="checkbox"
         className={cn(
-          'peer h-4 w-4 cursor-pointer transition-all appearance-none rounded  border border-slate-300 checked:bg-[#24a0ed] hst:checked:bg-hst-accent checked:border-[#24a0ed] hst:checked:border-hst-accent hst:rounded-none',
+          'peer h-4 w-4 cursor-pointer transition-all appearance-none rounded  border border-dark-primary dark:border-light-secondary checked:bg-[#24a0ed] checked:border-none hst:checked:bg-hst-accent   hst:rounded-none',
           hideWhenUnchecked && !checked
             ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-300'
             : '',

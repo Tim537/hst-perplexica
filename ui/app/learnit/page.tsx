@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Pencil, FileText, Layers, Trash2 } from 'lucide-react';
+import { FileText, Layers, Trash } from 'lucide-react';
 import SummaryDialog from '@/components/summaries/summaryDialog';
 import CardsDialog from '@/components/cards/cardsDialog';
 import { Card } from '@/components/cards/types';
@@ -123,8 +123,9 @@ export default function LearnitPage() {
         <button
           onClick={() => setActiveFilter('all')}
           className={cn(
-            'px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5',
-            activeFilter === 'all' && 'bg-[#24A0ED] text-white scale-105',
+            'px-4 py-1.5 text-sm rounded-md hst:rounded-none transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5 hst:hover:bg-hst-accent/5',
+            activeFilter === 'all' &&
+              'bg-[#24A0ED] text-white scale-105 hst:bg-hst-accent',
           )}
         >
           All
@@ -132,8 +133,9 @@ export default function LearnitPage() {
         <button
           onClick={() => setActiveFilter('summaries')}
           className={cn(
-            'px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5',
-            activeFilter === 'summaries' && 'bg-[#24A0ED] text-white scale-105',
+            'px-4 py-1.5 text-sm rounded-md hst:rounded-none transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5 hst:hover:bg-hst-accent/5',
+            activeFilter === 'summaries' &&
+              'bg-[#24A0ED] text-white scale-105 hst:bg-hst-accent',
           )}
         >
           <FileText className="w-4 h-4" />
@@ -142,9 +144,9 @@ export default function LearnitPage() {
         <button
           onClick={() => setActiveFilter('flashcards')}
           className={cn(
-            'px-4 py-1.5 text-sm rounded-md transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5',
+            'px-4 py-1.5 text-sm rounded-md hst:rounded-none transition-all flex items-center gap-2 hover:bg-[#24A0ED]/5 hst:hover:bg-hst-accent/5',
             activeFilter === 'flashcards' &&
-              'bg-[#24A0ED] text-white scale-105',
+              'bg-[#24A0ED] text-white scale-105 hst:bg-hst-accent',
           )}
         >
           <Layers className="w-4 h-4" />
@@ -164,7 +166,7 @@ export default function LearnitPage() {
               {summaries.map((summary: Summary) => (
                 <div
                   key={summary.id}
-                  className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
+                  className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] hst:hover:border-hst-accent hst:rounded-none transition-colors cursor-pointer group"
                   onClick={() => {
                     setIsSummaryDialogOpen(true);
                     setSelectedSummary(summary);
@@ -183,7 +185,7 @@ export default function LearnitPage() {
                         handleDeleteSummary(summary.id);
                       }}
                     >
-                      <Trash2 className="w-4 h-5 text-red-500" />
+                      <Trash className="w-4 h-5 text-red-500 hst:text-hst-accent" />
                     </button>
                   </div>
                 </div>
@@ -202,7 +204,7 @@ export default function LearnitPage() {
               {stacks.map((stack: any) => (
                 <div
                   key={stack.id}
-                  className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] transition-colors cursor-pointer group"
+                  className="p-4 border rounded-lg dark:border-dark-200 hover:border-[#24A0ED] dark:hover:border-[#24A0ED] hst:hover:border-hst-accent hst:rounded-none transition-colors cursor-pointer group"
                   onClick={() => {
                     setSelectedStack(stack);
                     setIsCardsDialogOpen(true);
@@ -222,7 +224,7 @@ export default function LearnitPage() {
                         handleDeleteStack(stack.id);
                       }}
                     >
-                      <Trash2 className="w-4 h-5 text-red-500" />
+                      <Trash className="w-4 h-5 text-red-500 hst:text-hst-accent" />
                     </button>
                   </div>
                   <p className="text-sm text-gray-500 mt-1">

@@ -1,4 +1,4 @@
-import { Pencil, Copy, Download, FileUp } from 'lucide-react';
+import { Pencil, Copy, Download } from 'lucide-react';
 
 import { editActions, copyActions, exportActions } from '../actions';
 
@@ -39,7 +39,7 @@ export const createCardsDialogFeatures = (stackId: number) => ({
     tooltip: 'Edit cards',
   },
   export: {
-    icon: FileUp,
+    icon: Download,
     label: 'Export',
     action: exportActions.cards,
     tooltip: 'Export cards',

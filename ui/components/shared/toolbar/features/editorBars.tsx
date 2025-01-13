@@ -18,7 +18,7 @@ import {
   PaintBucket,
   ArrowLeft,
   Save,
-  FileUp,
+  Download,
   Type,
   Trash,
 } from 'lucide-react';
@@ -56,7 +56,7 @@ export const createSummaryEditorFeatures = (
     },
   },
   export: {
-    icon: FileUp,
+    icon: Download,
     label: 'Export',
     tooltip: 'Export as file',
     action: () => {
@@ -256,7 +256,7 @@ export const createStackBarFeatures = (
     },
   },
   export: {
-    icon: FileUp,
+    icon: Download,
     label: 'Export',
     tooltip: 'Export as file',
     action: () => {

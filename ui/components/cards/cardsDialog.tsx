@@ -95,10 +95,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
   // Toolbar configuration
   const features = createCardsDialogFeatures(stackId);
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
