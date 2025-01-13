@@ -25,8 +25,9 @@ export default function Checkbox({
         type="checkbox"
         className={cn(
           'peer h-4 w-4 cursor-pointer transition-all appearance-none rounded  border border-slate-300 checked:bg-[#24a0ed] hst:checked:bg-hst-accent checked:border-[#24a0ed] hst:checked:border-hst-accent hst:rounded-none',
-          hideWhenUnchecked &&
-            'opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+          hideWhenUnchecked && !checked
+            ? 'opacity-0 group-hover:opacity-100 transition-opacity duration-300'
+            : '',
         )}
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
