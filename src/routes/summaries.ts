@@ -335,4 +335,41 @@ router.get('/:id/exportSummary', async (req, res) => {
   }
 });
 
+/**
+ * Delete a summary by its ID
+ * @route DELETE /:id/deleteSummary
+ * @param {number} id - The ID of the summary to delete
+ * @returns {Object} Success message and deleted summary
+ */
+router.delete('/:id/deleteSummary', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate ID
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return res.status(400).json({ message: 'ID must be a number' });
+    }
+
+    // Delete summary from database
+    const deletedSummary = await db
+      .delete(summaries)
+      .where(eq(summaries.id, numericId))
+      .returning()
+      .execute();
+
+    if (deletedSummary.length === 0) {
+      return res.status(404).json({ message: 'Summary not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Summary deleted successfully',
+      summary: deletedSummary[0],
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'An error has occurred.' });
+    logger.error(`Error deleting summary: ${err.message}`);
+  }
+});
+
 export default router;
