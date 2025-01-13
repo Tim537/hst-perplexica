@@ -14,7 +14,7 @@ import { useCards } from './useCards';
 import Tooltip from '@/components/shared/Tooltip';
 import { motion } from 'framer-motion';
 import { cardsApi, editActions } from '../shared/toolbar/actions/edit';
-
+import { CardsLoader } from '@/components/shared/loadings/cardsLoader';
 interface CardsDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -144,7 +144,6 @@ const CardsDialog: FC<CardsDialogProps> = ({
                   <DialogTitle className="text-xl font-medium text-dark-primary dark:text-light-primary">
                     {mode === 'generate' ? 'Generate Cards' : 'View Cards'}
                   </DialogTitle>
-                  {isGenerating && <h1>Generating cards...</h1>}
                   <Tooltip text="Close" spacing="0.5rem">
                     <button
                       onClick={() => setIsOpen(false)}
@@ -158,72 +157,79 @@ const CardsDialog: FC<CardsDialogProps> = ({
 
                 {/* Cards content area */}
                 <div className="relative w-full h-fit mt-6">
-                  <div className="mt-[3rem] mb-0 inset-0 flex items-center justify-center">
-                    {/* Card Stack Container */}
-                    <div className="relative w-[27.688rem] h-[18.750rem]">
-                      {/* Previous Card */}
-                      {previousCard && (
-                        <FlashCard
-                          key={`prev-${previousCard.id}`}
-                          card={previousCard}
-                          position="prev"
-                          zIndex={1}
-                          direction={direction}
-                          isAnimating={isAnimating}
-                        />
-                      )}
+                  {isGenerating ? (
+                    <div className="mt-[3rem] mb-0 inset-0 flex items-center justify-center">
+                      <CardsLoader />
+                    </div>
+                  ) : (
+                    <div className="mt-[3rem] mb-0 inset-0 flex items-center justify-center">
+                      {/* Card Stack Container */}
+                      <div className="relative w-[27.688rem] h-[18.750rem]">
+                        {/* Previous Card */}
+                        {/* Previous Card */}
+                        {previousCard && (
+                          <FlashCard
+                            key={`prev-${previousCard.id}`}
+                            card={previousCard}
+                            position="prev"
+                            zIndex={1}
+                            direction={direction}
+                            isAnimating={isAnimating}
+                          />
+                        )}
 
-                      {/* Current Card */}
-                      {currentCard && (
-                        <FlashCard
-                          key={`current-${currentCard.id}`}
-                          card={currentCard}
-                          position="current"
-                          zIndex={3}
-                          direction={direction}
-                          isAnimating={isAnimating}
-                        />
-                      )}
+                        {/* Current Card */}
+                        {currentCard && (
+                          <FlashCard
+                            key={`current-${currentCard.id}`}
+                            card={currentCard}
+                            position="current"
+                            zIndex={3}
+                            direction={direction}
+                            isAnimating={isAnimating}
+                          />
+                        )}
 
-                      {/* Next Card */}
-                      {nextCard && (
-                        <FlashCard
-                          key={`next-${nextCard.id}`}
-                          card={nextCard}
-                          position="next"
-                          zIndex={2}
-                          direction={direction}
-                          isAnimating={isAnimating}
-                        />
-                      )}
+                        {/* Next Card */}
+                        {nextCard && (
+                          <FlashCard
+                            key={`next-${nextCard.id}`}
+                            card={nextCard}
+                            position="next"
+                            zIndex={2}
+                            direction={direction}
+                            isAnimating={isAnimating}
+                          />
+                        )}
 
-                      {/* Navigation Buttons */}
-                      <motion.button
-                        onClick={handlePrevCard}
-                        disabled={isAnimating}
-                        className="absolute -left-5  z-10 p-2 top-1/2 rounded-full bg-[#24A0ED] hst:bg-hst-accent disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Previous card"
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <ChevronLeft className="w-6 h-6 text-light-primary" />
-                      </motion.button>
+                        {/* Navigation Buttons */}
+                        <motion.button
+                          onClick={handlePrevCard}
+                          disabled={isAnimating}
+                          className="absolute -left-5  z-10 p-2 top-1/2 rounded-full bg-[#24A0ED] hst:bg-hst-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Previous card"
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <ChevronLeft className="w-6 h-6 text-light-primary" />
+                        </motion.button>
 
-                      <motion.button
-                        onClick={handleNextCard}
-                        disabled={isAnimating}
-                        className="absolute -right-5 top-1/2 z-10 p-2 rounded-full bg-[#24A0ED] hst:bg-hst-accent  disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Next card"
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <ChevronRight className="w-6 h-6 text-light-primary" />
-                      </motion.button>
+                        <motion.button
+                          onClick={handleNextCard}
+                          disabled={isAnimating}
+                          className="absolute -right-5 top-1/2 z-10 p-2 rounded-full bg-[#24A0ED] hst:bg-hst-accent  disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Next card"
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <ChevronRight className="w-6 h-6 text-light-primary" />
+                        </motion.button>
 
-                      {/* Card Counter */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-dark-secondary dark:text-light-secondary bg-light-primary/80 dark:bg-dark-primary/80 px-2 py-1 rounded">
-                        {currentIndex + 1} / {totalCards}
+                        {/* Card Counter */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-dark-secondary dark:text-light-secondary bg-light-primary/80 dark:bg-dark-primary/80 px-2 py-1 rounded">
+                          {currentIndex + 1} / {totalCards}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Toolbar */}
