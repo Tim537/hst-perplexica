@@ -141,7 +141,7 @@ const CardsDialog: FC<CardsDialogProps> = ({
                   <Tooltip text="Close" spacing="0.5rem">
                     <button
                       onClick={() => setIsOpen(false)}
-                      className="text-[#757573] hover:text-[#454545] dark:hover:text-white hst:text-white/70 hst:hover:text-white/40 transition-colors"
+                      className="text-[#757573] hover:text-[#454545] dark:hover:text-white transition-colors"
                       aria-label="Close dialog"
                     >
                       <X className="w-6 h-6" />
