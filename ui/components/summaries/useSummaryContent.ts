@@ -7,7 +7,7 @@ interface UseSummaryContentProps {
 }
 
 export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
-  const [content, setContent] = useState<string | null>(null);
+  const [content, setContent] = useState<string>('is generating...');
   const [error, setError] = useState<string | null>(null);
   const [summaryData, setSummaryData] = useState<{ id: number } | null>(null);
 
@@ -19,7 +19,7 @@ export const useSummaryContent = ({ mode, chatId }: UseSummaryContentProps) => {
           setContent(summary.content);
           setSummaryData({ id: parseInt(summary.id) });
         } else if (mode === 'generate') {
-          setContent(null);
+          setContent('is generating...');
           setSummaryData(null);
         }
       } catch (err) {

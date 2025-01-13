@@ -30,7 +30,7 @@ interface SummaryDialogProps {
   /** Callback when a summary is generated (only used in 'generate' mode) */
   onGenerate?: (content: string) => void;
   /** The summary to display */
-  summary?: string;
+  summary: string;
   /** Whether the summary is loading */
   isGenerating?: boolean;
   chatId: string;
@@ -72,6 +72,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
 }) => {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [currentSummaryId, setCurrentSummaryId] = useState<number | null>(null);
+  const [textFieldContent, setTextFieldContent] = useState<string>('');
 
   // Content management
   const { content, setContent, error, summaryData } = useSummaryContent({
@@ -81,9 +82,9 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
 
   useEffect(() => {
     if (summary) {
-      setContent(summary);
+      setTextFieldContent(summary);
     }
-  }, [summary, setContent]);
+  }, [summary, setTextFieldContent]);
 
   useEffect(() => {
     if (summaryData?.id) {
@@ -166,7 +167,7 @@ const SummaryDialog: React.FC<SummaryDialogProps> = ({
                           className="bg-transparent"
                         />
                       ) : (
-                        <div>{content}</div>
+                        <div>{textFieldContent}</div>
                       )}
                     </div>
                   </div>

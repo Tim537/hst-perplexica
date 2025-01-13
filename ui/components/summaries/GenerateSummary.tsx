@@ -1,7 +1,7 @@
 import { FileText, PlusIcon, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Message } from '../chat/types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SummaryDialog from './summaryDialog';
 
 interface GenerateSummaryProps {
@@ -16,17 +16,32 @@ const GenerateSummary = ({
   existingSummaryId,
 }: GenerateSummaryProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [summary, setSummary] = useState<string | null>(
-    existingSummary || null,
-  );
+  const [summary, setSummary] = useState<string>('');
   const [summaryId, setSummaryId] = useState<string>(existingSummaryId);
   const [isGenerating, setIsGenerating] = useState(false);
-  const isViewMode = Boolean(existingSummary);
+  const [isViewMode, setIsViewMode] = useState(false);
+
+  useEffect(() => {
+    if (existingSummary && existingSummary.length > 1) {
+      setIsViewMode(true);
+    }
+  }, [existingSummary]);
+
+  useEffect(() => {
+    if (existingSummary) {
+      setSummary(existingSummary);
+    }
+  }, [existingSummary]);
+
+  console.log('existingSummary');
+  console.log(existingSummary);
+  console.log(Boolean(existingSummary));
+  console.log(summary);
 
   const handleGenerate = async () => {
     if (isViewMode) {
       setIsDialogOpen(true);
-      setSummary(existingSummary ? existingSummary : null);
+      setSummary(existingSummary || '');
       setSummaryId(existingSummaryId);
       return;
     }
@@ -51,6 +66,7 @@ const GenerateSummary = ({
         const data = await res.json();
         setSummary(data.summary.content);
         setSummaryId(data.summary.id.toString());
+        setIsViewMode(true);
         toast.success('Summary generated successfully');
       } else {
         toast.error('Failed to generate summary');
@@ -82,7 +98,7 @@ const GenerateSummary = ({
         setIsOpen={setIsDialogOpen}
         mode={isViewMode ? 'view' : 'generate'}
         onGenerate={handleGenerate}
-        summary={summary || undefined}
+        summary={summary}
         summaryId={summaryId}
         chatId={history[history.length - 1].chatId}
         isGenerating={isGenerating}
