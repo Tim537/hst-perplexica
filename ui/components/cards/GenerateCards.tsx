@@ -21,6 +21,7 @@ const GenerateCards = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [cards, setCards] = useState<CardData[]>([]);
   const [isViewMode, setIsViewMode] = useState(false);
+  const [stackIdNew, setStackIdNew] = useState<number>(stackId);
 
   useEffect(() => {
     setCards(existingCards);
@@ -55,6 +56,7 @@ const GenerateCards = ({
       if (res.status === 200 || res.status === 201) {
         const data = await res.json();
         setCards(data.stack.cards);
+        setStackIdNew(data.stack.id);
         toast.success('Cards generated successfully');
       } else {
         toast.error('Failed to generate cards');
@@ -88,7 +90,7 @@ const GenerateCards = ({
         onGenerate={handleGenerate}
         initialCards={cards ? cards : []}
         isGenerating={isGenerating}
-        stackId={stackId}
+        stackId={stackIdNew}
       />
     </>
   );
